@@ -86,10 +86,38 @@ yargs
 		process.exit(1);
 	});
 
+//Output option
+yargs
+	.option('o', {
+		alias: 'output',
+		describe: 'Folder output location',
+		type: 'string',
+		nargs: 1,
+		default: './dist',
+	})
+	.check((argv) => {
+		if (argv.o !== './dist') {
+			//Check if it is a directory and  exit
+			if (fs.existsSync(argv.o)) {
+				if (fs.lstatSync(argv.o).isDirectory()) return true;
+				throw new Error('Argument check failed: Must be a directory');
+			} else
+				throw new Error(
+					'Argument check failed: filepath is not a readable folder',
+				);
+		}
+		return true;
+	})
+	.fail((msg, err, yargs) => {
+		//Print Error with help option
+		console.error(`Error: ${msg}\n\n`);
+		console.log(yargs.help());
+		process.exit(1);
+	});
 //Call convertToHtml
 try {
-	convertToHtml(yargs.argv.i, isFile, yargs.argv.s);
-	console.log('File created successfully at ./dist');
+	convertToHtml(yargs.argv.i, isFile, yargs.argv.s, yargs.argv.o);
+	console.log(`File created successfully`);
 } catch (e) {
 	console.error(`Error: ${e}`);
 	process.exit(1);

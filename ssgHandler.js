@@ -24,7 +24,7 @@ const readFile = (filePath) => {
  * @param {string} fileName
  * @param {string} data
  */
-const createHtmlFile = (fileName = 'index', data, stylesheet = '') => {
+const createHtmlFile = (fileName = 'index', data, stylesheet = '', dir) => {
 	let htmlOption = {
 		title: '',
 		content: '',
@@ -51,7 +51,7 @@ const createHtmlFile = (fileName = 'index', data, stylesheet = '') => {
 
 	//Create a new html file
 	fs.writeFileSync(
-		`./dist/${fileName}.html`,
+		`${dir}/${fileName}.html`,
 		generateHTML(htmlOption),
 		(err) => {
 			if (err) throw new Error(err);
@@ -63,7 +63,7 @@ const createHtmlFile = (fileName = 'index', data, stylesheet = '') => {
  * @param {string} paths
  * @param {boolean} isFile
  */
-const convertToHtml = (paths, isFile, stylesheet = '') => {
+const convertToHtml = (paths, isFile, stylesheet = '', dir) => {
 	//Check if ./dist folder exist
 	//Remove if exist
 	if (fs.existsSync('./dist')) {
@@ -71,16 +71,16 @@ const convertToHtml = (paths, isFile, stylesheet = '') => {
 			if (err) throw new Error(err);
 		});
 	}
-
-	//Create a new folder call ./dist
-	fs.mkdirSync('./dist', { recursive: true }, (err) => {
-		if (err) throw new Error(err);
-	});
+	if (dir === './dist')
+		//Create a new folder call ./dist
+		fs.mkdirSync('./dist', { recursive: true }, (err) => {
+			if (err) throw new Error(err);
+		});
 
 	if (isFile) {
 		readFile(paths)
 			.then((data) => {
-				createHtmlFile(undefined, data, stylesheet);
+				createHtmlFile(undefined, data, stylesheet, dir);
 			})
 			.catch((err) => {
 				throw new Error(err);
@@ -89,7 +89,7 @@ const convertToHtml = (paths, isFile, stylesheet = '') => {
 		fs.readdirSync(paths).forEach((file) => {
 			readFile(path.join(paths, file))
 				.then((data) => {
-					createHtmlFile(path.basename(file), data, stylesheet);
+					createHtmlFile(path.basename(file), data, stylesheet, dir);
 				})
 				.catch((err) => {
 					throw err;
