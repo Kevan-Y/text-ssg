@@ -35,14 +35,13 @@ yargs
 				if (path.extname(argv.i) === '.txt') {
 					isFile = true;
 					return true;
-				} else
-					throw new Error('Argument check failed: file must be a .txt\n\n');
+				} else throw new Error('Argument check failed: file must be a .txt');
 			} else if (fs.lstatSync(argv.i).isDirectory()) {
 				//Check if directory contains any file with ext .txt
 				fs.readdirSync(argv.i).forEach((file) => {
 					if (path.extname(file) !== '.txt')
 						throw new Error(
-							"Argument check failed: Directory doesn't contain any .txt file\n\n",
+							"Argument check failed: Directory doesn't contain any .txt file",
 						);
 				});
 				isFile = false;
@@ -50,7 +49,7 @@ yargs
 			return true;
 		} else
 			throw new Error(
-				'Argument check failed: filepath is not a readable file or folder\n\n',
+				'Argument check failed: filepath is not a readable file or folder',
 			);
 	})
 	.fail((msg, err, yargs) => {
@@ -60,9 +59,36 @@ yargs
 		process.exit(1);
 	});
 
+//Stylesheet option
+yargs
+	.option('s', {
+		alias: 'stylesheet',
+		demandOption: false,
+		describe: 'URL to a CSS stylesheet',
+		type: 'string',
+		nargs: 1,
+	})
+	.check((argv) => {
+		if (argv.s) {
+			//Check if it is an URL of a CSS stylesheet
+			if (/^http.*\.css$/.test(argv.s)) return true;
+			else
+				throw new Error(
+					'Argument check failed: Must be an URL to a CSS stylesheet',
+				);
+		}
+		return true;
+	})
+	.fail((msg, err, yargs) => {
+		//Print Error with help option
+		console.error(`Error: ${msg}\n\n`);
+		console.log(yargs.help());
+		process.exit(1);
+	});
+
 //Call convertToHtml
 try {
-	convertToHtml(yargs.argv.i, isFile);
+	convertToHtml(yargs.argv.i, isFile, yargs.argv.s);
 	console.log('File created successfully at ./dist');
 } catch (e) {
 	console.error(`Error: ${e}`);

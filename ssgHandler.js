@@ -24,10 +24,11 @@ const readFile = (filePath) => {
  * @param {string} fileName
  * @param {string} data
  */
-const createHtmlFile = (fileName = 'index', data) => {
+const createHtmlFile = (fileName = 'index', data, stylesheet = '') => {
 	let htmlOption = {
 		title: '',
 		content: '',
+		style: stylesheet,
 	};
 
 	//convert data into an array
@@ -62,7 +63,7 @@ const createHtmlFile = (fileName = 'index', data) => {
  * @param {string} paths
  * @param {boolean} isFile
  */
-const convertToHtml = (paths, isFile) => {
+const convertToHtml = (paths, isFile, stylesheet = '') => {
 	//Check if ./dist folder exist
 	//Remove if exist
 	if (fs.existsSync('./dist')) {
@@ -79,7 +80,7 @@ const convertToHtml = (paths, isFile) => {
 	if (isFile) {
 		readFile(paths)
 			.then((data) => {
-				createHtmlFile(undefined, data);
+				createHtmlFile(undefined, data, stylesheet);
 			})
 			.catch((err) => {
 				throw new Error(err);
@@ -88,10 +89,10 @@ const convertToHtml = (paths, isFile) => {
 		fs.readdirSync(paths).forEach((file) => {
 			readFile(path.join(paths, file))
 				.then((data) => {
-					createHtmlFile(path.basename(file), data);
+					createHtmlFile(path.basename(file), data, stylesheet);
 				})
 				.catch((err) => {
-					throw new Error(err);
+					throw err;
 				});
 		});
 	}
