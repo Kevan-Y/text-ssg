@@ -3,7 +3,7 @@ const generateHtmlTemplate = require('./generateHtmlTemplate');
 const path = require('path');
 
 /**
- * ReadFile wrapped with Promise
+ * readFile wrapped with Promise
  * @param {string} filePath
  */
 const readFile = (filePath) => {
@@ -53,18 +53,21 @@ const treatData = (data) => {
  * @param {string} stylesheet
  * @param {string} outputPath
  */
-const createHtmlFile = (fileName, data, stylesheet = '', outputPath) => {
+const createHtmlFile = async (fileName, data, stylesheet = '', outputPath) => {
 	let htmlOption = {
 		...treatData(data),
 		style: stylesheet,
 	};
 	//Create a new html file
-	fs.writeFileSync(
-		`${outputPath}/${fileName}.html`,
+	await fs.promises.writeFile(
+		path.join(`${outputPath}`, `${fileName}.html`),
 		generateHtmlTemplate(htmlOption),
 		(err) => {
 			if (err) throw new Error(err);
 		},
+	);
+	console.log(
+		`File created -> ${path.join(`${outputPath}`, `${fileName}.html`)}`,
 	);
 };
 
@@ -74,38 +77,59 @@ const createHtmlFile = (fileName, data, stylesheet = '', outputPath) => {
  * @param {string} outputPath
  * @param {boolean} isFile
  */
-const convertToHtml = (inputPaths, stylesheet = '', outputPath, isFile) => {
+const convertToHtml = async (
+	inputPaths,
+	stylesheet = '',
+	outputPath,
+	isFile,
+) => {
 	//Check if ./dist folder exist
 	//Remove if exist
-	if (fs.existsSync('./dist')) {
-		fs.rmSync('./dist', { recursive: true }, (err) => {
+	if (fs.existsSync('./dist') && outputPath === './dist') {
+		await fs.promises.rm('./dist', { force: true, recursive: true }, (err) => {
 			if (err) throw new Error(err);
 		});
 	}
 	if (outputPath === './dist')
 		//Create a new folder call ./dist
-		fs.mkdirSync('./dist', { recursive: true }, (err) => {
+		await fs.promises.mkdir('./dist', { recursive: true }, (err) => {
 			if (err) throw new Error(err);
 		});
 
 	if (isFile) {
 		readFile(inputPaths)
 			.then((data) => {
-				createHtmlFile(path.basename(inputPaths), data, stylesheet, outputPath);
+				createHtmlFile(
+					path.basename(inputPaths, '.txt'),
+					data,
+					stylesheet,
+					outputPath,
+				);
 			})
 			.catch((err) => {
 				throw new Error(err);
 			});
 	} else {
-		fs.readdirSync(inputPaths).forEach((file) => {
-			if (path.extname(file) === '.txt') {
-				readFile(path.join(inputPaths, file))
-					.then((data) => {
-						createHtmlFile(path.basename(file), data, stylesheet, outputPath);
-					})
-					.catch((err) => {
-						throw err;
-					});
+		fs.readdir(inputPaths, (err, files) => {
+			if (err) throw new Error(err);
+			else {
+				files.forEach((file) => {
+					//Look for .txt file and createHtmlFile if found
+					if (path.extname(file) === '.txt') {
+						readFile(path.join(inputPaths, file))
+							.then((data) => {
+								createHtmlFile(
+									path.basename(file, '.txt'),
+									data,
+									stylesheet,
+									outputPath,
+								);
+							})
+							.catch((err) => {
+								throw new Error(err);
+							});
+					}
+				});
 			}
 		});
 	}

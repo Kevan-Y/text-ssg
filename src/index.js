@@ -105,7 +105,7 @@ yargs
 	})
 	.check((argv) => {
 		if (argv.o !== './dist') {
-			//Check if it is a directory and  exit
+			//Check if it is a directory and exit
 			if (fs.existsSync(argv.o)) {
 				if (fs.lstatSync(argv.o).isDirectory()) return true;
 				else throw new Error('Path must be a directory.');
@@ -116,7 +116,6 @@ yargs
 //Call convertToHtml
 try {
 	convertToHtml(yargs.argv.i, yargs.argv.s, yargs.argv.o, isFile);
-	console.log(`File created successfully`);
 } catch (e) {
 	console.error(`\n\n${chalk.red.bold('Error:')} ${e}`);
 	process.exit(1);
