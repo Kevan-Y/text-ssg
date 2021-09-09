@@ -60,12 +60,17 @@ yargs
 					return true;
 				} else throw new Error('File must be a .txt');
 			} else if (fs.lstatSync(argv.i).isDirectory()) {
-				//Check if directory contains any file with ext .txt
-				fs.readdirSync(argv.i).forEach((file) => {
-					if (path.extname(file) !== '.txt')
-						throw new Error("Directory doesn't contain any .txt file.");
-				});
 				isFile = false;
+				let hasTxtFile;
+				//Check if directory contains at least one .txt file
+				for (let file of fs.readdirSync(argv.i)) {
+					if (path.extname(file) === '.txt') {
+						hasTxtFile = true;
+						break;
+					}
+				}
+				if (!hasTxtFile)
+					throw new Error("Directory doesn't contain any .txt file.");
 			}
 			return true;
 		} else throw new Error('Directory or file must exist.');
