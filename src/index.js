@@ -36,6 +36,7 @@ yargs.example(`ssg -i <path> -o <path> -s <URL>`);
 yargs.strict().fail((msg, err, yargs) => {
 	//Print Error with help option
 	console.log(yargs.help());
+
 	console.error(`\n\n${chalk.red.bold('Error:')} ${msg}`);
 	process.exit(1);
 });
@@ -114,10 +115,10 @@ yargs
 
 //Call convertToHtml
 try {
-	convertToHtml(yargs.argv.i, isFile, yargs.argv.s, yargs.argv.o);
+	convertToHtml(yargs.argv.i, yargs.argv.s, yargs.argv.o, isFile);
 	console.log(`File created successfully`);
 } catch (e) {
-	console.error(`\n\n${chalk.red.bold('Error:')} ${msg}`);
+	console.error(`\n\n${chalk.red.bold('Error:')} ${e}`);
 	process.exit(1);
 }
 yargs.argv;

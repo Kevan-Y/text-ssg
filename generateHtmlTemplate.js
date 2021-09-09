@@ -1,4 +1,4 @@
-const generateHTML = (options) => {
+const generateHtmlTemplate = (options) => {
 	return `
     <!doctype html>
     <html lang="en">
@@ -75,4 +75,4 @@ const generateHTML = (options) => {
     </html>
     `;
 };
-module.exports = generateHTML;
+module.exports = generateHtmlTemplate;
