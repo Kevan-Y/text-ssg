@@ -87,13 +87,15 @@ const convertToHtml = (paths, isFile, stylesheet = '', dir) => {
 			});
 	} else {
 		fs.readdirSync(paths).forEach((file) => {
-			readFile(path.join(paths, file))
-				.then((data) => {
-					createHtmlFile(path.basename(file), data, stylesheet, dir);
-				})
-				.catch((err) => {
-					throw err;
-				});
+			if (path.extname(file) === '.txt') {
+				readFile(path.join(paths, file))
+					.then((data) => {
+						createHtmlFile(path.basename(file), data, stylesheet, dir);
+					})
+					.catch((err) => {
+						throw err;
+					});
+			}
 		});
 	}
 };

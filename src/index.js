@@ -3,8 +3,17 @@ const yargs = require('yargs');
 const version = require('../package.json').version;
 const fs = require('fs');
 const path = require('path');
+const clear = require('clear');
 const convertToHtml = require('../ssgHandler');
+const chalk = require('chalk');
+const figlet = require('figlet');
 let isFile;
+
+//Clear CLI and display Header
+clear();
+console.log(
+	chalk.blue(figlet.textSync('Text - SSG', { horizontalLayout: 'full' })),
+);
 
 //version
 yargs.version(version).alias('version', 'v');
@@ -14,8 +23,22 @@ yargs.help('help').alias('help', 'h');
 
 //Usage description
 yargs.usage(
-	'Static Site Generator: This CLI convert a .txt file into a .html file',
+	'Usage: This is a Static Site Generator CLI that convert a .txt file into a .html file',
 );
+
+//Examples
+yargs.example(`ssg --input <path>`);
+yargs.example(`ssg --input <path> --output <path>`);
+yargs.example(`ssg --input <path> --output <path> --stylesheet <URL>`);
+yargs.example(`ssg -i <path> -o <path> -s <URL>`);
+
+//reject non explicits
+yargs.strict().fail((msg, err, yargs) => {
+	//Print Error with help option
+	console.log(yargs.help());
+	console.error(`\n\n${chalk.red.bold('Error:')} ${msg}`);
+	process.exit(1);
+});
 
 //Input option
 yargs
@@ -35,28 +58,17 @@ yargs
 				if (path.extname(argv.i) === '.txt') {
 					isFile = true;
 					return true;
-				} else throw new Error('Argument check failed: file must be a .txt');
+				} else throw new Error('File must be a .txt');
 			} else if (fs.lstatSync(argv.i).isDirectory()) {
 				//Check if directory contains any file with ext .txt
 				fs.readdirSync(argv.i).forEach((file) => {
 					if (path.extname(file) !== '.txt')
-						throw new Error(
-							"Argument check failed: Directory doesn't contain any .txt file",
-						);
+						throw new Error("Directory doesn't contain any .txt file.");
 				});
 				isFile = false;
 			}
 			return true;
-		} else
-			throw new Error(
-				'Argument check failed: filepath is not a readable file or folder',
-			);
-	})
-	.fail((msg, err, yargs) => {
-		//Print Error with help option
-		console.error(`Error: ${msg}`);
-		console.log(yargs.help());
-		process.exit(1);
+		} else throw new Error('Directory or file must exist.');
 	});
 
 //Stylesheet option
@@ -72,18 +84,8 @@ yargs
 		if (argv.s) {
 			//Check if it is an URL of a CSS stylesheet
 			if (/^http.*\.css$/.test(argv.s)) return true;
-			else
-				throw new Error(
-					'Argument check failed: Must be an URL to a CSS stylesheet',
-				);
-		}
-		return true;
-	})
-	.fail((msg, err, yargs) => {
-		//Print Error with help option
-		console.error(`Error: ${msg}\n\n`);
-		console.log(yargs.help());
-		process.exit(1);
+			else throw new Error('Must be an URL to a CSS stylesheet.');
+		} else return true;
 	});
 
 //Output option
@@ -100,26 +102,17 @@ yargs
 			//Check if it is a directory and  exit
 			if (fs.existsSync(argv.o)) {
 				if (fs.lstatSync(argv.o).isDirectory()) return true;
-				throw new Error('Argument check failed: Must be a directory');
-			} else
-				throw new Error(
-					'Argument check failed: filepath is not a readable folder',
-				);
-		}
-		return true;
-	})
-	.fail((msg, err, yargs) => {
-		//Print Error with help option
-		console.error(`Error: ${msg}\n\n`);
-		console.log(yargs.help());
-		process.exit(1);
+				else throw new Error('Path must be a directory.');
+			} else throw new Error('Directory must exist.');
+		} else return true;
 	});
+
 //Call convertToHtml
 try {
 	convertToHtml(yargs.argv.i, isFile, yargs.argv.s, yargs.argv.o);
 	console.log(`File created successfully`);
 } catch (e) {
-	console.error(`Error: ${e}`);
+	console.error(`\n\n${chalk.red.bold('Error:')} ${msg}`);
 	process.exit(1);
 }
 yargs.argv;

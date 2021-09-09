@@ -20,6 +20,9 @@
 		"ssg": "./src/index.js"
 	},
 	"dependencies": {
+		"chalk": "^4.1.2",
+		"clear": "^0.1.0",
+		"figlet": "^1.5.2",
 		"yargs": "^17.1.1"
 	}
 }
