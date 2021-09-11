@@ -1,5 +1,5 @@
 const fs = require('fs');
-const generateHtmlTemplate = require('./generateHtmlTemplate');
+const generateHTML = require('./generateHtmlTemplate');
 const path = require('path');
 
 /**
@@ -26,7 +26,7 @@ const readFile = (filePath) => {
 const treatData = (data) => {
 	let dataTreated = { title: '', content: '' };
 	//convert data into an array
-	data = data.split('\n');
+	data = data.split('\n').map((sentence) => sentence.replace('\r', ''));
 
 	if (data.length >= 3) {
 		//Check if title exist
@@ -58,17 +58,37 @@ const createHtmlFile = async (fileName, data, stylesheet = '', outputPath) => {
 		...treatData(data),
 		style: stylesheet,
 	};
+	const noSpaceFileName = fileName.replace(' ', '_');
+
 	//Create a new html file
 	await fs.promises.writeFile(
-		path.join(`${outputPath}`, `${fileName}.html`),
-		generateHtmlTemplate(htmlOption),
+		path.join(`${outputPath}`, `${noSpaceFileName}.html`),
+		generateHTML.generateHtmlTemplate(htmlOption),
 		(err) => {
 			if (err) throw new Error(err);
 		},
 	);
 	console.log(
-		`File created -> ${path.join(`${outputPath}`, `${fileName}.html`)}`,
+		`File created -> ${path.join(`${outputPath}`, `${noSpaceFileName}.html`)}`,
 	);
+	return path.join(`${outputPath}`, `${fileName}.html`);
+};
+
+const createIndexHtmlFile = async (routeList, stylesheet = '', outputPath) => {
+	let htmlOption = {
+		routeList,
+		style: stylesheet,
+	};
+
+	//Create a new html file
+	await fs.promises.writeFile(
+		path.join(`${outputPath}`, `index.html`),
+		generateHTML.generateHtmlMenuTemplate(htmlOption),
+		(err) => {
+			if (err) throw new Error(err);
+		},
+	);
+	console.log(`File created -> ${path.join(`${outputPath}`, `index.html`)}`);
 };
 
 /**
@@ -83,6 +103,7 @@ const convertToHtml = async (
 	outputPath,
 	isFile,
 ) => {
+	let routesList = [];
 	//Check if ./dist folder exist
 	//Remove if exist
 	if (fs.existsSync('./dist') && outputPath === './dist') {
@@ -97,39 +118,54 @@ const convertToHtml = async (
 		});
 
 	if (isFile) {
-		readFile(inputPaths)
-			.then((data) => {
-				createHtmlFile(
-					path.basename(inputPaths, '.txt'),
-					data,
-					stylesheet,
-					outputPath,
-				);
-			})
-			.catch((err) => {
-				throw new Error(err);
-			});
+		const data = await readFile(inputPaths);
+
+		let createdFileName = await createHtmlFile(
+			path.basename(inputPaths, '.txt'),
+			data,
+			stylesheet,
+			outputPath,
+		);
+
+		//Add to the array routesList to generate <a> in index.html
+		routesList.push({
+			url: createdFileName
+				.replace(path.normalize(outputPath), '')
+				.substr(1)
+				.replace(' ', '_'),
+			name: path.basename(createdFileName, '.html'),
+		});
+		await createIndexHtmlFile(routesList, stylesheet, outputPath);
 	} else {
-		fs.readdir(inputPaths, (err, files) => {
+		fs.readdir(inputPaths, async (err, files) => {
 			if (err) throw new Error(err);
 			else {
-				files.forEach((file) => {
-					//Look for .txt file and createHtmlFile if found
+				for (const file of files) {
 					if (path.extname(file) === '.txt') {
-						readFile(path.join(inputPaths, file))
-							.then((data) => {
-								createHtmlFile(
-									path.basename(file, '.txt'),
-									data,
-									stylesheet,
-									outputPath,
-								);
-							})
-							.catch((err) => {
-								throw new Error(err);
-							});
+						const data = await readFile(path.join(inputPaths, file));
+
+						let createdFileName = await createHtmlFile(
+							path.basename(file, '.txt'),
+							data,
+							stylesheet,
+							outputPath,
+						);
+
+						//Add to the array routesList to generate <a> in index.html
+						routesList.push({
+							url: (/^\\|\//.test(
+								createdFileName.replace(path.normalize(outputPath), '')[0],
+							)
+								? createdFileName
+										.replace(path.normalize(outputPath), '')
+										.substr(1)
+								: createdFileName.replace(path.normalize(outputPath), '')
+							).replace(' ', '_'),
+							name: path.basename(createdFileName, '.html'),
+						});
 					}
-				});
+				}
+				await createIndexHtmlFile(routesList, stylesheet, outputPath);
 			}
 		});
 	}

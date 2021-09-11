@@ -37,7 +37,7 @@ yargs.strict().fail((msg, err, yargs) => {
 	//Print Error with help option
 	console.log(yargs.help());
 
-	console.error(`\n\n${chalk.red.bold('Error:')} ${msg}`);
+	console.error(`\n\n${chalk.red.bold('Error:')} ${chalk.red(msg || err)}`);
 	process.exit(1);
 });
 
@@ -117,7 +117,7 @@ yargs
 try {
 	convertToHtml(yargs.argv.i, yargs.argv.s, yargs.argv.o, isFile);
 } catch (e) {
-	console.error(`\n\n${chalk.red.bold('Error:')} ${e}`);
+	console.error(`\n\n${chalk.red.bold('Error:')} ${chalk.red(e)}`);
 	process.exit(1);
 }
 yargs.argv;
