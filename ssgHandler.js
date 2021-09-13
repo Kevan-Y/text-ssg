@@ -58,22 +58,27 @@ const createHtmlFile = async (fileName, data, stylesheet = '', outputPath) => {
 		...treatData(data),
 		style: stylesheet,
 	};
-	const noSpaceFileName = fileName.replace(' ', '_');
 
 	//Create a new html file
 	await fs.promises.writeFile(
-		path.join(`${outputPath}`, `${noSpaceFileName}.html`),
+		path.join(`${outputPath}`, `${fileName}.html`),
 		generateHTML.generateHtmlTemplate(htmlOption),
 		(err) => {
 			if (err) throw new Error(err);
 		},
 	);
 	console.log(
-		`File created -> ${path.join(`${outputPath}`, `${noSpaceFileName}.html`)}`,
+		`File created -> ${path.join(`${outputPath}`, `${fileName}.html`)}`,
 	);
 	return path.join(`${outputPath}`, `${fileName}.html`);
 };
 
+/**
+ * createHtmlFile generateHTML file
+ * @param {Array} routeList - Array containing name and url for the file route
+ * @param {string} stylesheet
+ * @param {string} outputPath
+ */
 const createIndexHtmlFile = async (routeList, stylesheet = '', outputPath) => {
 	let htmlOption = {
 		routeList,
@@ -89,6 +94,31 @@ const createIndexHtmlFile = async (routeList, stylesheet = '', outputPath) => {
 		},
 	);
 	console.log(`File created -> ${path.join(`${outputPath}`, `index.html`)}`);
+};
+
+/**
+ * getAllFiles getting all file of a folder recursively
+ * @param {string} dirPath
+ * @param {Array} filesPathList
+ */
+const getAllFiles = async (dirPath, filesPathList) => {
+	const files = await fs.promises.readdir(dirPath);
+	filesPathList ||= [];
+
+	for (const file of files) {
+		const fileLstat = await fs.promises.lstat(path.join(dirPath, file));
+		if (fileLstat.isDirectory()) {
+			filesPathList = await getAllFiles(
+				path.join(dirPath, file),
+				filesPathList,
+			);
+		} else {
+			if (path.extname(file) === '.txt')
+				filesPathList.push(path.join(dirPath, file));
+		}
+	}
+
+	return filesPathList;
 };
 
 /**
@@ -118,8 +148,10 @@ const convertToHtml = async (
 		});
 
 	if (isFile) {
+		//Read file data
 		const data = await readFile(inputPaths);
 
+		//Create the html file
 		let createdFileName = await createHtmlFile(
 			path.basename(inputPaths, '.txt'),
 			data,
@@ -129,45 +161,65 @@ const convertToHtml = async (
 
 		//Add to the array routesList to generate <a> in index.html
 		routesList.push({
-			url: createdFileName
-				.replace(path.normalize(outputPath), '')
-				.substr(1)
-				.replace(' ', '_'),
+			url: createdFileName.replace(path.normalize(outputPath), '').substr(1),
 			name: path.basename(createdFileName, '.html'),
 		});
 		await createIndexHtmlFile(routesList, stylesheet, outputPath);
 	} else {
-		fs.readdir(inputPaths, async (err, files) => {
-			if (err) throw new Error(err);
-			else {
-				for (const file of files) {
-					if (path.extname(file) === '.txt') {
-						const data = await readFile(path.join(inputPaths, file));
+		//Get allFiles
+		const filesPathList = [];
+		await getAllFiles(inputPaths, filesPathList);
 
-						let createdFileName = await createHtmlFile(
-							path.basename(file, '.txt'),
-							data,
-							stylesheet,
-							outputPath,
-						);
-
-						//Add to the array routesList to generate <a> in index.html
-						routesList.push({
-							url: (/^\\|\//.test(
-								createdFileName.replace(path.normalize(outputPath), '')[0],
-							)
-								? createdFileName
-										.replace(path.normalize(outputPath), '')
-										.substr(1)
-								: createdFileName.replace(path.normalize(outputPath), '')
-							).replace(' ', '_'),
-							name: path.basename(createdFileName, '.html'),
-						});
-					}
-				}
-				await createIndexHtmlFile(routesList, stylesheet, outputPath);
+		const listFolderPath = [];
+		//Remove root folder and removes duplicates
+		for (let filePath of filesPathList) {
+			filePath = filePath.split(/\\|\//);
+			filePath.shift();
+			filePath = filePath.join('/');
+			if (!listFolderPath.includes(path.dirname(filePath))) {
+				listFolderPath.push(path.dirname(filePath));
 			}
-		});
+		}
+
+		//Create folder
+		for (let dir of listFolderPath) {
+			await fs.promises.mkdir(
+				path.join(outputPath, dir),
+				{ recursive: true },
+				(err) => {
+					if (err) throw new Error(err);
+				},
+			);
+		}
+
+		for (let filePath of filesPathList) {
+			//Read file data
+			const data = await readFile(filePath);
+
+			//Remove root folder
+			filePath = filePath.split(/\\|\//);
+			filePath.shift();
+			const noRootFilePath = filePath.join('/');
+
+			//Create the html file
+			let createdFileName = await createHtmlFile(
+				path.basename(noRootFilePath, '.txt'),
+				data,
+				stylesheet,
+				path.join(outputPath, path.dirname(noRootFilePath)),
+			);
+
+			//Add to the array routesList to generate <a> in index.html
+			routesList.push({
+				url: /^\\|\//.test(
+					createdFileName.replace(path.normalize(outputPath), '')[0],
+				)
+					? createdFileName.replace(path.normalize(outputPath), '').substr(1)
+					: createdFileName.replace(path.normalize(outputPath), ''),
+				name: path.basename(createdFileName, '.html'),
+			});
+		}
+		await createIndexHtmlFile(routesList, stylesheet, outputPath);
 	}
 };
 
