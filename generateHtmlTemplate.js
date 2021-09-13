@@ -62,6 +62,17 @@ const generateHtmlTemplate = (options) => {
         margin-top: 24px;
         font-weight: bold;
     }
+
+    a {
+        text-decoration: none;
+        color: #2563EB;
+        transition: ease-in 150ms;
+    }
+
+    a:hover {
+        text-decoration: underline;
+        color: #3B82F6;
+    }
 </style>`
 				}
     </head>
@@ -139,6 +150,17 @@ const generateHtmlMenuTemplate = (options) => {
         margin-bottom: 12px;
         margin-top: 24px;
         font-weight: bold;
+    }
+
+    a {
+        text-decoration: none;
+        color: #2563EB;
+        transition: ease-in 150ms;
+    }
+
+    a:hover {
+        text-decoration: underline;
+        color: #3B82F6;
     }
 </style>`
 				}
