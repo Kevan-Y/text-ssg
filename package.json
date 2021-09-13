@@ -1,6 +1,6 @@
 {
 	"name": "webtext",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"description": "",
 	"main": "src/index.js",
 	"scripts": {
@@ -8,14 +8,14 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/Kevan-Y/webtext.git"
+		"url": "git+https://github.com/Kevan-Y/text-ssg.git"
 	},
 	"author": "Kevan Yang",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/Kevan-Y/webtext/issues"
+		"url": "https://github.com/Kevan-Y/text-ssg/issues"
 	},
-	"homepage": "https://github.com/Kevan-Y/webtext#readme",
+	"homepage": "https://github.com/Kevan-Y/text-ssg#readme",
 	"bin": {
 		"ssg": "./src/index.js"
 	},
