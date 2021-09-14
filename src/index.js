@@ -62,14 +62,29 @@ yargs
 				} else throw new Error('File must be a .txt');
 			} else if (fs.lstatSync(argv.i).isDirectory()) {
 				isFile = false;
-				let hasTxtFile;
-				//Check if directory contains at least one .txt file
-				for (let file of fs.readdirSync(argv.i)) {
-					if (path.extname(file) === '.txt') {
-						hasTxtFile = true;
-						break;
+
+				//checkTxtFile recursively check if any .txt file exist
+				const checkTxtFile = (dirPath) => {
+					const dirContents = fs.readdirSync(dirPath);
+
+					//Loop through the content of the directory
+					for (const dirContent of dirContents) {
+						const dirContentLstat = fs.lstatSync(
+							path.join(dirPath, dirContent),
+						);
+
+						if (dirContentLstat.isDirectory()) {
+							if (checkTxtFile(path.join(dirPath, dirContent))) return true;
+						} else {
+							if (path.extname(dirContent) === '.txt') return true;
+						}
 					}
-				}
+					return false;
+				};
+
+				//Check if directory contains at least one .txt file
+				const hasTxtFile = checkTxtFile(argv.i);
+
 				if (!hasTxtFile)
 					throw new Error("Directory doesn't contain any .txt file.");
 			}
