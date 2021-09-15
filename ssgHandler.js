@@ -59,16 +59,17 @@ const createHtmlFile = async (fileName, data, stylesheet = '', outputPath) => {
 		style: stylesheet,
 	};
 
+	const noSpaceFileName = fileName.replaceAll(' ', '-');
 	//Create a new html file
 	await fs.promises.writeFile(
-		path.join(`${outputPath}`, `${fileName}.html`),
+		path.join(`${outputPath}`, `${noSpaceFileName}.html`),
 		generateHTML.generateHtmlTemplate(htmlOption),
 		(err) => {
 			if (err) throw new Error(err);
 		},
 	);
 	console.log(
-		`File created -> ${path.join(`${outputPath}`, `${fileName}.html`)}`,
+		`File created -> ${path.join(`${outputPath}`, `${noSpaceFileName}.html`)}`,
 	);
 	return path.join(`${outputPath}`, `${fileName}.html`);
 };
@@ -161,7 +162,10 @@ const convertToHtml = async (
 
 		//Add to the array routesList to generate <a> in index.html
 		routesList.push({
-			url: createdFileName.replace(path.normalize(outputPath), '').substr(1),
+			url: createdFileName
+				.replace(path.normalize(outputPath), '')
+				.substr(1)
+				.replaceAll(' ', '-'),
 			name: path.basename(createdFileName, '.html'),
 		});
 		await createIndexHtmlFile(routesList, stylesheet, outputPath);
@@ -184,7 +188,7 @@ const convertToHtml = async (
 		//Create folder
 		for (let dir of listFolderPath) {
 			await fs.promises.mkdir(
-				path.join(outputPath, dir),
+				path.join(outputPath, dir).replaceAll(' ', '-'),
 				{ recursive: true },
 				(err) => {
 					if (err) throw new Error(err);
@@ -206,16 +210,19 @@ const convertToHtml = async (
 				path.basename(noRootFilePath, '.txt'),
 				data,
 				stylesheet,
-				path.join(outputPath, path.dirname(noRootFilePath)),
+				path
+					.join(outputPath, path.dirname(noRootFilePath))
+					.replaceAll(' ', '-'),
 			);
 
 			//Add to the array routesList to generate <a> in index.html
 			routesList.push({
-				url: /^\\|\//.test(
+				url: (/^\\|\//.test(
 					createdFileName.replace(path.normalize(outputPath), '')[0],
 				)
 					? createdFileName.replace(path.normalize(outputPath), '').substr(1)
-					: createdFileName.replace(path.normalize(outputPath), ''),
+					: createdFileName.replace(path.normalize(outputPath), '')
+				).replaceAll(' ', '-').replaceAll('\\', '/'),
 				name: path.basename(createdFileName, '.html'),
 			});
 		}
