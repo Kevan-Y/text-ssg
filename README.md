@@ -6,7 +6,7 @@
 
 ```bash
 git clone <this repo>
-Install node latest node >= 16
+Install the latest node >= 16
 npm i
 npm i -g .
 ```
@@ -18,6 +18,7 @@ npm i -g .
 - Supports specific output. By passing an existing folder to `-o` or `--output`, if not specified it will generate to `dist` folder (See usage).
 - Supports deep tree of files and folders. If the user specifies a folder for `--input` or `-i`
 - Generate a menu page `index.html` which has relative links to each of the generated HTML files.
+- New paragraph is separated by a line.
 
 ## Usage
 
