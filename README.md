@@ -6,6 +6,7 @@
 
 ```bash
 git clone <this repo>
+Install node latest node >= 16
 npm i
 npm i -g .
 ```
