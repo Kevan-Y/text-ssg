@@ -1,6 +1,6 @@
 <h1 align="center">Welcome to Text SSG 👋</h1>
 
-> Static Site Generator in CLI that convert a .txt file into a .html file
+> Static Site Generator in CLI that convert .txt and .md files into .html files
 
 ## Install
 

@@ -77,7 +77,7 @@ const generateHtmlTemplate = (options) => {
 				}
     </head>
     <body>
-        <h1>${options.title || 'Document'}</h1>
+        ${options.extname === '.txt' ? `<h1>${options.title || 'Document'}</h1>` : ''}
         ${
 					options.content.map((phrases) => `<p>${phrases}</p>\n`).join('\n') ||
 					''

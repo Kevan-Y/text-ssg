@@ -23,26 +23,55 @@ const readFile = (filePath) => {
  * @param {string} data
  * @return {object} title and content
  */
-const treatData = (data) => {
+const treatData = (data, fileExtension) => {
 	let dataTreated = { title: '', content: '' };
-	//convert data into an array
-	data = data.split('\n').map((sentence) => sentence.replace('\r', ''));
 
-	if (data.length >= 3) {
-		//Check if title exist
-		if (data[0] && !data[1] && !data[2]) {
-			dataTreated.title = data[0];
-			data = data.slice(3);
+	if (fileExtension === '.txt') {
+		//convert data into an array
+		data = data.split('\n').map((sentence) => sentence.replace('\r', ''));
+
+		if (data.length >= 3) {
+			//Check if title exist
+			if (data[0] && !data[1] && !data[2]) {
+				dataTreated.title = data[0];
+				data = data.slice(3);
+			}
 		}
+
+		//Remove empty array and combine sentence together
+		data.forEach((phase, i) => {
+			if (!phase) data[i] = '_space_';
+		});
+		data = data.join('').split('_space_');
+		dataTreated.content = data;
 	}
+	else {
+		// If file is .md, assuming the Markdown syntax is correct, replace each Markdown tag to its HTML equivalent
 
-	//Remove empty array and combine sentence together
-	data.forEach((phase, i) => {
-		if (!phase) data[i] = '_space_';
-	});
-	data = data.join('').split('_space_');
-	dataTreated.content = data;
+		// heading starts with 1 or more hash sign followed by a white space
+		const headings = new RegExp(/^\s*(#{1,6})\s+(.+)$/, 'gm');
+		data = data.replaceAll(headings, (match, hash, title) => {
+			dataTreated.title = !dataTreated.title ? title : dataTreated.title;
 
+			const tag = `h${hash.length}`;
+			return `<${tag}>${title}</${tag}>`;
+		});
+
+		// bold texts could be either **text** or __text__
+		const bolds = new RegExp(/[\*_]{2}(.+?)[\*_]{2}/, 'gm');
+		data = data.replaceAll(bolds, '<strong>$1</strong>');
+
+		// italic texts could be either *text* or _text_
+		const italics = new RegExp(/[\*_]{1}(.+?)[\*_]{1}/, 'gm');
+		data = data.replaceAll(italics, '<i>$1</i>');
+
+		// Links could be in the form [name](href title) or [name](href)
+		const links = new RegExp(/\[(.*?)\]\((.+?)(?:\s"(.*?)")?\)/, 'gm');
+		data = data.replaceAll(links, (match, p1, p2, p3) => `<a href="${p2}" ${p3 ? `title="${p3}"`: ''}>${p1}</a>`);
+
+		// in markdown, paragraphs are splitted by one or more New line.
+		dataTreated.content =  data.split(/(?:\r?\n)+/);
+	}
 	return dataTreated;
 };
 
@@ -54,9 +83,13 @@ const treatData = (data) => {
  * @param {string} outputPath
  */
 const createHtmlFile = async (fileName, data, stylesheet = '', outputPath) => {
+	const extname = path.extname(fileName);
+	fileName = path.basename(fileName, extname);
+
 	let htmlOption = {
-		...treatData(data),
+		...treatData(data, extname),
 		style: stylesheet,
+		extname,
 	};
 
 	const noSpaceFileName = fileName.replaceAll(' ', '-');
@@ -114,7 +147,8 @@ const getAllFiles = async (dirPath, filesPathList) => {
 				filesPathList,
 			);
 		} else {
-			if (path.extname(file) === '.txt')
+			const extname = path.extname(file);
+			if (extname === '.txt' || extname === '.md')
 				filesPathList.push(path.join(dirPath, file));
 		}
 	}
@@ -154,7 +188,7 @@ const convertToHtml = async (
 
 		//Create the html file
 		let createdFileName = await createHtmlFile(
-			path.basename(inputPaths, '.txt'),
+			path.basename(inputPaths),
 			data,
 			stylesheet,
 			outputPath,
@@ -207,7 +241,7 @@ const convertToHtml = async (
 
 			//Create the html file
 			let createdFileName = await createHtmlFile(
-				path.basename(noRootFilePath, '.txt'),
+				path.basename(noRootFilePath),
 				data,
 				stylesheet,
 				path
