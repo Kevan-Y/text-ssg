@@ -12,7 +12,7 @@ let isFile;
 //Clear CLI and display Header
 clear();
 console.log(
-	chalk.blue(figlet.textSync('Text - SSG', { horizontalLayout: 'full' })),
+	chalk.blue(figlet.textSync('Text - SSG', { horizontalLayout: 'full' }))
 );
 
 //version
@@ -23,7 +23,7 @@ yargs.help('help').alias('help', 'h');
 
 //Usage description
 yargs.usage(
-	'Usage: This is a Static Site Generator CLI that convert a .txt file into a .html file',
+	'Usage: This is a Static Site Generator CLI that convert .txt and .md files into .html files'
 );
 
 //Examples
@@ -55,38 +55,40 @@ yargs
 		if (fs.existsSync(argv.i)) {
 			//Check if path is a file or directory
 			if (fs.lstatSync(argv.i).isFile()) {
-				//Check if path is a file ext end with .txt
-				if (path.extname(argv.i) === '.txt') {
+				const extname = path.extname(argv.i);
+				//Check if path is a file ext end with .txt, or .md
+				if (extname === '.txt' || extname === '.md') {
 					isFile = true;
 					return true;
-				} else throw new Error('File must be a .txt');
+				} else throw new Error('File must be a .txt or .md');
 			} else if (fs.lstatSync(argv.i).isDirectory()) {
 				isFile = false;
 
-				//checkTxtFile recursively check if any .txt file exist
-				const checkTxtFile = (dirPath) => {
+				//checkValidFile recursively check if any .txt or .md file exist
+				const checkValidFile = (dirPath) => {
 					const dirContents = fs.readdirSync(dirPath);
 
 					//Loop through the content of the directory
 					for (const dirContent of dirContents) {
 						const dirContentLstat = fs.lstatSync(
-							path.join(dirPath, dirContent),
+							path.join(dirPath, dirContent)
 						);
 
 						if (dirContentLstat.isDirectory()) {
-							if (checkTxtFile(path.join(dirPath, dirContent))) return true;
+							if (checkValidFile(path.join(dirPath, dirContent))) return true;
 						} else {
-							if (path.extname(dirContent) === '.txt') return true;
+							const extname = path.extname(dirContent);
+							if (extname === '.txt' || extname === '.md') return true;
 						}
 					}
 					return false;
 				};
 
-				//Check if directory contains at least one .txt file
-				const hasTxtFile = checkTxtFile(argv.i);
+				//Check if directory contains at least one .txt or .md file
+				const hasValidFile = checkValidFile(argv.i);
 
-				if (!hasTxtFile)
-					throw new Error("Directory doesn't contain any .txt file.");
+				if (!hasValidFile)
+					throw new Error("Directory doesn't contain any .txt or .md file.");
 			}
 			return true;
 		} else throw new Error('Directory or file must exist.');
