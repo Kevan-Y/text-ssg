@@ -43,34 +43,40 @@ const treatData = (data, fileExtension) => {
 			if (!phase) data[i] = '_space_';
 		});
 		data = data.join('').split('_space_');
-		dataTreated.content = data;
-	}
-	else {
+		dataTreated.content = data.map((paragraph) => `<p>${paragraph}</p>`);
+	} else {
 		// If file is .md, assuming the Markdown syntax is correct, replace each Markdown tag to its HTML equivalent
 
-		// heading starts with 1 or more hash sign followed by a white space
-		const headings = new RegExp(/^\s*(#{1,6})\s+(.+)$/, 'gm');
-		data = data.replaceAll(headings, (match, hash, title) => {
-			dataTreated.title = !dataTreated.title ? title : dataTreated.title;
+		// Links could have the form of [name](href title) or [name](href)
+		const links = new RegExp(/\[(.*?)\]\((.+?)(?:\s"(.*?)")?\)/, 'gm');
+		data = data.replaceAll(
+			links,
+			(match, p1, p2, p3) =>
+				`<a href="${p2}" ${p3 ? `title="${p3}"` : ''}>${p1}</a>`
+		);
 
-			const tag = `h${hash.length}`;
-			return `<${tag}>${title}</${tag}>`;
-		});
-
-		// bold texts could be either **text** or __text__
-		const bolds = new RegExp(/[\*_]{2}(.+?)[\*_]{2}/, 'gm');
+		const bolds = new RegExp(/\*{2}(.+?)\*{2}/, 'gm');
 		data = data.replaceAll(bolds, '<strong>$1</strong>');
 
-		// italic texts could be either *text* or _text_
-		const italics = new RegExp(/[\*_]{1}(.+?)[\*_]{1}/, 'gm');
+		const italics = new RegExp(/\*{1}(.+?)\*{1}/, 'gm');
 		data = data.replaceAll(italics, '<i>$1</i>');
 
-		// Links could be in the form [name](href title) or [name](href)
-		const links = new RegExp(/\[(.*?)\]\((.+?)(?:\s"(.*?)")?\)/, 'gm');
-		data = data.replaceAll(links, (match, p1, p2, p3) => `<a href="${p2}" ${p3 ? `title="${p3}"`: ''}>${p1}</a>`);
+		data = data.split(/(?:\r?\n)+/).map((paragraph) => {
+			// heading starts with 1 or more hash sign followed by a white space
+			const headings = new RegExp(/^\s*(#{1,6})\s+(.+)$/, 'gm');
+			if (headings.test(paragraph)) {
+				return paragraph.replaceAll(headings, (match, hash, title) => {
+					dataTreated.title =
+						!dataTreated.title && hash.length === 1 ? title : dataTreated.title;
+					const tag = `h${hash.length}`;
+					return `<${tag}>${title}</${tag}>`;
+				});
+			}
+			return `<p>${paragraph}</p>`;
+		});
 
 		// in markdown, paragraphs are splitted by one or more New line.
-		dataTreated.content =  data.split(/(?:\r?\n)+/);
+		dataTreated.content = data;
 	}
 	return dataTreated;
 };
@@ -99,10 +105,10 @@ const createHtmlFile = async (fileName, data, stylesheet = '', outputPath) => {
 		generateHTML.generateHtmlTemplate(htmlOption),
 		(err) => {
 			if (err) throw new Error(err);
-		},
+		}
 	);
 	console.log(
-		`File created -> ${path.join(`${outputPath}`, `${noSpaceFileName}.html`)}`,
+		`File created -> ${path.join(`${outputPath}`, `${noSpaceFileName}.html`)}`
 	);
 	return path.join(`${outputPath}`, `${fileName}.html`);
 };
@@ -125,7 +131,7 @@ const createIndexHtmlFile = async (routeList, stylesheet = '', outputPath) => {
 		generateHTML.generateHtmlMenuTemplate(htmlOption),
 		(err) => {
 			if (err) throw new Error(err);
-		},
+		}
 	);
 	console.log(`File created -> ${path.join(`${outputPath}`, `index.html`)}`);
 };
@@ -144,7 +150,7 @@ const getAllFiles = async (dirPath, filesPathList) => {
 		if (fileLstat.isDirectory()) {
 			filesPathList = await getAllFiles(
 				path.join(dirPath, file),
-				filesPathList,
+				filesPathList
 			);
 		} else {
 			const extname = path.extname(file);
@@ -166,7 +172,7 @@ const convertToHtml = async (
 	inputPaths,
 	stylesheet = '',
 	outputPath,
-	isFile,
+	isFile
 ) => {
 	let routesList = [];
 	//Check if ./dist folder exist
@@ -191,7 +197,7 @@ const convertToHtml = async (
 			path.basename(inputPaths),
 			data,
 			stylesheet,
-			outputPath,
+			outputPath
 		);
 
 		//Add to the array routesList to generate <a> in index.html
@@ -226,7 +232,7 @@ const convertToHtml = async (
 				{ recursive: true },
 				(err) => {
 					if (err) throw new Error(err);
-				},
+				}
 			);
 		}
 
@@ -244,19 +250,19 @@ const convertToHtml = async (
 				path.basename(noRootFilePath),
 				data,
 				stylesheet,
-				path
-					.join(outputPath, path.dirname(noRootFilePath))
-					.replaceAll(' ', '-'),
+				path.join(outputPath, path.dirname(noRootFilePath)).replaceAll(' ', '-')
 			);
 
 			//Add to the array routesList to generate <a> in index.html
 			routesList.push({
 				url: (/^\\|\//.test(
-					createdFileName.replace(path.normalize(outputPath), '')[0],
+					createdFileName.replace(path.normalize(outputPath), '')[0]
 				)
 					? createdFileName.replace(path.normalize(outputPath), '').substr(1)
 					: createdFileName.replace(path.normalize(outputPath), '')
-				).replaceAll(' ', '-').replaceAll('\\', '/'),
+				)
+					.replaceAll(' ', '-')
+					.replaceAll('\\', '/'),
 				name: path.basename(createdFileName, '.html'),
 			});
 		}

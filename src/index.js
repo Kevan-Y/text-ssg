@@ -12,7 +12,7 @@ let isFile;
 //Clear CLI and display Header
 clear();
 console.log(
-	chalk.blue(figlet.textSync('Text - SSG', { horizontalLayout: 'full' })),
+	chalk.blue(figlet.textSync('Text - SSG', { horizontalLayout: 'full' }))
 );
 
 //version
@@ -23,7 +23,7 @@ yargs.help('help').alias('help', 'h');
 
 //Usage description
 yargs.usage(
-	'Usage: This is a Static Site Generator CLI that convert .txt and .md files into .html files',
+	'Usage: This is a Static Site Generator CLI that convert .txt and .md files into .html files'
 );
 
 //Examples
@@ -71,7 +71,7 @@ yargs
 					//Loop through the content of the directory
 					for (const dirContent of dirContents) {
 						const dirContentLstat = fs.lstatSync(
-							path.join(dirPath, dirContent),
+							path.join(dirPath, dirContent)
 						);
 
 						if (dirContentLstat.isDirectory()) {

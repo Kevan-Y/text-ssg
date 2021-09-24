@@ -77,10 +77,13 @@ const generateHtmlTemplate = (options) => {
 				}
     </head>
     <body>
-        ${options.extname === '.txt' ? `<h1>${options.title || 'Document'}</h1>` : ''}
         ${
-					options.content.map((phrases) => `<p>${phrases}</p>\n`).join('\n') ||
-					''
+					options.extname === '.txt'
+						? `<h1>${options.title || 'Document'}</h1>`
+						: ''
+				}
+        ${
+					options.content.map((paragraph) => `${paragraph}\n`).join('\n') || ''
 				} 
     </body>
     </html>
@@ -172,7 +175,6 @@ const generateHtmlMenuTemplate = (options) => {
         ${options.routeList
 					.map((route) => `<li><a href='${route.url}'>${route.name}</a></li>`)
 					.join('\n')}
-           
         </ul>
     </body>
     </html>
