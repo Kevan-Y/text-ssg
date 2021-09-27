@@ -52,7 +52,7 @@ const treatData = (data, fileExtension) => {
 		data = data.replaceAll(
 			links,
 			(match, p1, p2, p3) =>
-				`<a href="${p2}" ${p3 ? `title="${p3}"` : ''}>${p1}</a>`
+				`<a href="${p2}" ${p3 ? `title="${p3}"` : ''}>${p1}</a>`,
 		);
 
 		const bolds = new RegExp(/\*{2}(.+?)\*{2}/, 'gm');
@@ -105,10 +105,10 @@ const createHtmlFile = async (fileName, data, stylesheet = '', outputPath) => {
 		generateHTML.generateHtmlTemplate(htmlOption),
 		(err) => {
 			if (err) throw new Error(err);
-		}
+		},
 	);
 	console.log(
-		`File created -> ${path.join(`${outputPath}`, `${noSpaceFileName}.html`)}`
+		`File created -> ${path.join(`${outputPath}`, `${noSpaceFileName}.html`)}`,
 	);
 	return path.join(`${outputPath}`, `${fileName}.html`);
 };
@@ -131,7 +131,7 @@ const createIndexHtmlFile = async (routeList, stylesheet = '', outputPath) => {
 		generateHTML.generateHtmlMenuTemplate(htmlOption),
 		(err) => {
 			if (err) throw new Error(err);
-		}
+		},
 	);
 	console.log(`File created -> ${path.join(`${outputPath}`, `index.html`)}`);
 };
@@ -143,14 +143,14 @@ const createIndexHtmlFile = async (routeList, stylesheet = '', outputPath) => {
  */
 const getAllFiles = async (dirPath, filesPathList) => {
 	const files = await fs.promises.readdir(dirPath);
-	filesPathList ||= [];
+	filesPathList = filesPathList || [];
 
 	for (const file of files) {
 		const fileLstat = await fs.promises.lstat(path.join(dirPath, file));
 		if (fileLstat.isDirectory()) {
 			filesPathList = await getAllFiles(
 				path.join(dirPath, file),
-				filesPathList
+				filesPathList,
 			);
 		} else {
 			const extname = path.extname(file);
@@ -172,7 +172,7 @@ const convertToHtml = async (
 	inputPaths,
 	stylesheet = '',
 	outputPath,
-	isFile
+	isFile,
 ) => {
 	let routesList = [];
 	//Check if ./dist folder exist
@@ -197,7 +197,7 @@ const convertToHtml = async (
 			path.basename(inputPaths),
 			data,
 			stylesheet,
-			outputPath
+			outputPath,
 		);
 
 		//Add to the array routesList to generate <a> in index.html
@@ -232,7 +232,7 @@ const convertToHtml = async (
 				{ recursive: true },
 				(err) => {
 					if (err) throw new Error(err);
-				}
+				},
 			);
 		}
 
@@ -250,13 +250,15 @@ const convertToHtml = async (
 				path.basename(noRootFilePath),
 				data,
 				stylesheet,
-				path.join(outputPath, path.dirname(noRootFilePath)).replaceAll(' ', '-')
+				path
+					.join(outputPath, path.dirname(noRootFilePath))
+					.replaceAll(' ', '-'),
 			);
 
 			//Add to the array routesList to generate <a> in index.html
 			routesList.push({
 				url: (/^\\|\//.test(
-					createdFileName.replace(path.normalize(outputPath), '')[0]
+					createdFileName.replace(path.normalize(outputPath), '')[0],
 				)
 					? createdFileName.replace(path.normalize(outputPath), '').substr(1)
 					: createdFileName.replace(path.normalize(outputPath), '')
