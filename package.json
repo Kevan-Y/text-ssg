@@ -4,7 +4,8 @@
 	"description": "This is a Static Site Generator CLI that convert .txt and .md files into .html files",
 	"main": "src/index.js",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"build": "npm i -g . --force && ssg -i './samples' -s https://unpkg.com/sakura.css/css/sakura-vader.css"
 	},
 	"repository": {
 		"type": "git",
