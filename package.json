@@ -1,7 +1,7 @@
 {
-	"name": "webtext",
+	"name": "text-ssg",
 	"version": "0.1.0",
-	"description": "",
+	"description": "This is a Static Site Generator CLI that convert .txt and .md files into .html files",
 	"main": "src/index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
