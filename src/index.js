@@ -1,18 +1,18 @@
 #! /usr/bin/env node
 const yargs = require('yargs');
 const version = require('../package.json').version;
-const fs = require('fs');
-const path = require('path');
 const clear = require('clear');
 const convertToHtml = require('../ssgHandler');
 const chalk = require('chalk');
 const figlet = require('figlet');
-let isFile;
+const { stylesheetCheck } = require('./utils/yargsOptionCheck/stylesheetCheck');
+const { outputCheck } = require('./utils/yargsOptionCheck/outputCheck');
+const { inputCheck, isFile } = require('./utils/yargsOptionCheck/inputCheck');
 
 //Clear CLI and display Header
 clear();
 console.log(
-	chalk.blue(figlet.textSync('Text - SSG', { horizontalLayout: 'full' }))
+	chalk.blue(figlet.textSync('Text - SSG', { horizontalLayout: 'full' })),
 );
 
 //version
@@ -23,7 +23,7 @@ yargs.help('help').alias('help', 'h');
 
 //Usage description
 yargs.usage(
-	'Usage: This is a Static Site Generator CLI that convert .txt and .md files into .html files'
+	'Usage: This is a Static Site Generator CLI that convert .txt and .md files into .html files',
 );
 
 //Examples
@@ -51,47 +51,7 @@ yargs
 		nargs: 1,
 	})
 	.check((argv) => {
-		//Check if path exist
-		if (fs.existsSync(argv.i)) {
-			//Check if path is a file or directory
-			if (fs.lstatSync(argv.i).isFile()) {
-				const extname = path.extname(argv.i);
-				//Check if path is a file ext end with .txt, or .md
-				if (extname === '.txt' || extname === '.md') {
-					isFile = true;
-					return true;
-				} else throw new Error('File must be a .txt or .md');
-			} else if (fs.lstatSync(argv.i).isDirectory()) {
-				isFile = false;
-
-				//checkValidFile recursively check if any .txt or .md file exist
-				const checkValidFile = (dirPath) => {
-					const dirContents = fs.readdirSync(dirPath);
-
-					//Loop through the content of the directory
-					for (const dirContent of dirContents) {
-						const dirContentLstat = fs.lstatSync(
-							path.join(dirPath, dirContent)
-						);
-
-						if (dirContentLstat.isDirectory()) {
-							if (checkValidFile(path.join(dirPath, dirContent))) return true;
-						} else {
-							const extname = path.extname(dirContent);
-							if (extname === '.txt' || extname === '.md') return true;
-						}
-					}
-					return false;
-				};
-
-				//Check if directory contains at least one .txt or .md file
-				const hasValidFile = checkValidFile(argv.i);
-
-				if (!hasValidFile)
-					throw new Error("Directory doesn't contain any .txt or .md file.");
-			}
-			return true;
-		} else throw new Error('Directory or file must exist.');
+		return inputCheck(argv.i);
 	});
 
 //Stylesheet option
@@ -104,11 +64,7 @@ yargs
 		nargs: 1,
 	})
 	.check((argv) => {
-		if (argv.s) {
-			//Check if it is an URL of a CSS stylesheet
-			if (/^http.*\.css$/.test(argv.s)) return true;
-			else throw new Error('Must be an URL to a CSS stylesheet.');
-		} else return true;
+		return stylesheetCheck(argv.s);
 	});
 
 //Output option
@@ -121,18 +77,12 @@ yargs
 		default: './dist',
 	})
 	.check((argv) => {
-		if (argv.o !== './dist') {
-			//Check if it is a directory and exit
-			if (fs.existsSync(argv.o)) {
-				if (fs.lstatSync(argv.o).isDirectory()) return true;
-				else throw new Error('Path must be a directory.');
-			} else throw new Error('Directory must exist.');
-		} else return true;
+		return outputCheck(argv.o);
 	});
 
 //Call convertToHtml
 try {
-	convertToHtml(yargs.argv.i, yargs.argv.s, yargs.argv.o, isFile);
+	convertToHtml(yargs.argv.i, yargs.argv.s, yargs.argv.o, isFile(yargs.argv.i));
 } catch (e) {
 	console.error(`\n\n${chalk.red.bold('Error:')} ${chalk.red(e)}`);
 	process.exit(1);
