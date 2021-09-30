@@ -47,6 +47,10 @@ const treatData = (data, fileExtension) => {
 	} else {
 		// If file is .md, assuming the Markdown syntax is correct, replace each Markdown tag to its HTML equivalent
 
+		// convert --- to <hr>
+		const hr = new RegExp(/^---$/, 'gm');
+		data = data.replaceAll(hr, '<hr>');
+
 		// Links could have the form of [name](href title) or [name](href)
 		const links = new RegExp(/\[(.*?)\]\((.+?)(?:\s"(.*?)")?\)/, 'gm');
 		data = data.replaceAll(
@@ -72,6 +76,7 @@ const treatData = (data, fileExtension) => {
 					return `<${tag}>${title}</${tag}>`;
 				});
 			}
+			if (/^<.*>$/.test(paragraph)) return paragraph;
 			return `<p>${paragraph}</p>`;
 		});
 

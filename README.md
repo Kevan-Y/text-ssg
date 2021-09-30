@@ -1,8 +1,6 @@
 <h1 align="center">Welcome to Text SSG 👋</h1>
 
 > Static Site Generator in CLI that convert .txt and .md files into .html files
->
-> Markdown support: headings, inline italic or bold texts, links with or without title
 
 ## Install
 
@@ -22,6 +20,7 @@ npm i -g .
 - Generate a menu page `index.html` which has relative links to each of the generated HTML files.
 - New paragraph is separated by a line.
 - Supports language code for HTML tag lang attribute. By passing a language code to `-l` or `--lang`, if not specified it will use a default lang (See usage).
+- Markdown support: headings, horizontal line, inline italic or bold texts, links with or without title
 
 ## Usage
 
