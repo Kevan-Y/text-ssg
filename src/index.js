@@ -31,7 +31,10 @@ yargs.usage(
 yargs.example(`ssg --input <path>`);
 yargs.example(`ssg --input <path> --output <path>`);
 yargs.example(`ssg --input <path> --output <path> --stylesheet <URL>`);
-yargs.example(`ssg -i <path> -o <path> -s <URL>`);
+yargs.example(
+	`ssg --input <path> --output <path> --stylesheet <URL> --lang <languageCode>`,
+);
+yargs.example(`ssg -i <path> -o <path> -s <URL> -l <languageCode>`);
 
 //reject non explicits
 yargs.strict().fail((msg, err, yargs) => {
@@ -95,7 +98,13 @@ yargs
 	});
 //Call convertToHtml
 try {
-	convertToHtml(yargs.argv.i, yargs.argv.s, yargs.argv.o, isFile(yargs.argv.i),yargs.argv.l);
+	convertToHtml(
+		yargs.argv.i,
+		yargs.argv.s,
+		yargs.argv.o,
+		isFile(yargs.argv.i),
+		yargs.argv.l,
+	);
 } catch (e) {
 	console.error(`\n\n${chalk.red.bold('Error:')} ${chalk.red(e)}`);
 	process.exit(1);
