@@ -8,6 +8,7 @@ const figlet = require('figlet');
 const { stylesheetCheck } = require('./utils/yargsOptionCheck/stylesheetCheck');
 const { outputCheck } = require('./utils/yargsOptionCheck/outputCheck');
 const { inputCheck, isFile } = require('./utils/yargsOptionCheck/inputCheck');
+const { langCheck } = require('./utils/yargsOptionCheck/langCheck');
 
 //Clear CLI and display Header
 clear();
@@ -80,9 +81,21 @@ yargs
 		return outputCheck(argv.o);
 	});
 
+//Language option
+yargs
+	.option('l', {
+		alias: 'lang',
+		describe: 'HTML lang tag',
+		type: 'string',
+		nargs: 1,
+		default: 'en-CA',
+	})
+	.check((argv) => {
+		return langCheck(argv.l);
+	});
 //Call convertToHtml
 try {
-	convertToHtml(yargs.argv.i, yargs.argv.s, yargs.argv.o, isFile(yargs.argv.i));
+	convertToHtml(yargs.argv.i, yargs.argv.s, yargs.argv.o, isFile(yargs.argv.i),yargs.argv.l);
 } catch (e) {
 	console.error(`\n\n${chalk.red.bold('Error:')} ${chalk.red(e)}`);
 	process.exit(1);

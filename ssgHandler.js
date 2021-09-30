@@ -52,7 +52,7 @@ const treatData = (data, fileExtension) => {
 		data = data.replaceAll(
 			links,
 			(match, p1, p2, p3) =>
-				`<a href="${p2}" ${p3 ? `title="${p3}"` : ''}>${p1}</a>`
+				`<a href="${p2}" ${p3 ? `title="${p3}"` : ''}>${p1}</a>`,
 		);
 
 		const bolds = new RegExp(/\*{2}(.+?)\*{2}/, 'gm');
@@ -87,8 +87,15 @@ const treatData = (data, fileExtension) => {
  * @param {string} data
  * @param {string} stylesheet
  * @param {string} outputPath
+ * @param {string} langCode
  */
-const createHtmlFile = async (fileName, data, stylesheet = '', outputPath) => {
+const createHtmlFile = async (
+	fileName,
+	data,
+	stylesheet = '',
+	outputPath,
+	langCode,
+) => {
 	const extname = path.extname(fileName);
 	fileName = path.basename(fileName, extname);
 
@@ -96,6 +103,7 @@ const createHtmlFile = async (fileName, data, stylesheet = '', outputPath) => {
 		...treatData(data, extname),
 		style: stylesheet,
 		extname,
+		langCode,
 	};
 
 	const noSpaceFileName = fileName.replaceAll(' ', '-');
@@ -105,10 +113,10 @@ const createHtmlFile = async (fileName, data, stylesheet = '', outputPath) => {
 		generateHTML.generateHtmlTemplate(htmlOption),
 		(err) => {
 			if (err) throw new Error(err);
-		}
+		},
 	);
 	console.log(
-		`File created -> ${path.join(`${outputPath}`, `${noSpaceFileName}.html`)}`
+		`File created -> ${path.join(`${outputPath}`, `${noSpaceFileName}.html`)}`,
 	);
 	return path.join(`${outputPath}`, `${fileName}.html`);
 };
@@ -118,11 +126,18 @@ const createHtmlFile = async (fileName, data, stylesheet = '', outputPath) => {
  * @param {Array} routeList - Array containing name and url for the file route
  * @param {string} stylesheet
  * @param {string} outputPath
+ * @param {string} langCode
  */
-const createIndexHtmlFile = async (routeList, stylesheet = '', outputPath) => {
+const createIndexHtmlFile = async (
+	routeList,
+	stylesheet = '',
+	outputPath,
+	langCode,
+) => {
 	let htmlOption = {
 		routeList,
 		style: stylesheet,
+		langCode,
 	};
 
 	//Create a new html file
@@ -131,7 +146,7 @@ const createIndexHtmlFile = async (routeList, stylesheet = '', outputPath) => {
 		generateHTML.generateHtmlMenuTemplate(htmlOption),
 		(err) => {
 			if (err) throw new Error(err);
-		}
+		},
 	);
 	console.log(`File created -> ${path.join(`${outputPath}`, `index.html`)}`);
 };
@@ -150,7 +165,7 @@ const getAllFiles = async (dirPath, filesPathList) => {
 		if (fileLstat.isDirectory()) {
 			filesPathList = await getAllFiles(
 				path.join(dirPath, file),
-				filesPathList
+				filesPathList,
 			);
 		} else {
 			const extname = path.extname(file);
@@ -167,12 +182,14 @@ const getAllFiles = async (dirPath, filesPathList) => {
  * @param {string} stylesheet
  * @param {string} outputPath
  * @param {boolean} isFile
+ * @param {string} langCode
  */
 const convertToHtml = async (
 	inputPaths,
 	stylesheet = '',
 	outputPath,
-	isFile
+	isFile,
+	langCode,
 ) => {
 	let routesList = [];
 	//Check if ./dist folder exist
@@ -197,7 +214,8 @@ const convertToHtml = async (
 			path.basename(inputPaths),
 			data,
 			stylesheet,
-			outputPath
+			outputPath,
+			langCode,
 		);
 
 		//Add to the array routesList to generate <a> in index.html
@@ -208,7 +226,7 @@ const convertToHtml = async (
 				.replaceAll(' ', '-'),
 			name: path.basename(createdFileName, '.html'),
 		});
-		await createIndexHtmlFile(routesList, stylesheet, outputPath);
+		await createIndexHtmlFile(routesList, stylesheet, outputPath, langCode);
 	} else {
 		//Get allFiles
 		const filesPathList = [];
@@ -232,7 +250,7 @@ const convertToHtml = async (
 				{ recursive: true },
 				(err) => {
 					if (err) throw new Error(err);
-				}
+				},
 			);
 		}
 
@@ -250,13 +268,16 @@ const convertToHtml = async (
 				path.basename(noRootFilePath),
 				data,
 				stylesheet,
-				path.join(outputPath, path.dirname(noRootFilePath)).replaceAll(' ', '-')
+				path
+					.join(outputPath, path.dirname(noRootFilePath))
+					.replaceAll(' ', '-'),
+				langCode,
 			);
 
 			//Add to the array routesList to generate <a> in index.html
 			routesList.push({
 				url: (/^\\|\//.test(
-					createdFileName.replace(path.normalize(outputPath), '')[0]
+					createdFileName.replace(path.normalize(outputPath), '')[0],
 				)
 					? createdFileName.replace(path.normalize(outputPath), '').substr(1)
 					: createdFileName.replace(path.normalize(outputPath), '')
@@ -266,7 +287,7 @@ const convertToHtml = async (
 				name: path.basename(createdFileName, '.html'),
 			});
 		}
-		await createIndexHtmlFile(routesList, stylesheet, outputPath);
+		await createIndexHtmlFile(routesList, stylesheet, outputPath, langCode);
 	}
 };
 

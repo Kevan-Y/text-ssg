@@ -1,7 +1,7 @@
 const generateHtmlTemplate = (options) => {
 	return `
     <!doctype html>
-    <html lang="en">
+    <html lang="${options.langCode || 'en-CA'}">
     <head>
         <meta charset="UTF-8">
         <title>${options.title || 'Document'}</title>
@@ -93,7 +93,7 @@ const generateHtmlTemplate = (options) => {
 const generateHtmlMenuTemplate = (options) => {
 	return `
     <!doctype html>
-    <html lang="en">
+    <html lang="${options.langCode || 'en-CA'}">
     <head>
         <meta charset="UTF-8">
         <title>Home</title>
