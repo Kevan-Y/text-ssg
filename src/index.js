@@ -9,6 +9,7 @@ const { stylesheetCheck } = require('./utils/yargsOptionCheck/stylesheetCheck');
 const { outputCheck } = require('./utils/yargsOptionCheck/outputCheck');
 const { inputCheck, isFile } = require('./utils/yargsOptionCheck/inputCheck');
 const { langCheck } = require('./utils/yargsOptionCheck/langCheck');
+const { configCheck } = require('./utils/yargsOptionCheck/configurationCheck');
 
 //Clear CLI and display Header
 clear();
@@ -44,6 +45,21 @@ yargs.strict().fail((msg, err, yargs) => {
 	console.error(`\n\n${chalk.red.bold('Error:')} ${chalk.red(msg || err)}`);
 	process.exit(1);
 });
+
+
+//Configuration option
+yargs
+.option('c', {
+	alias: 'config',
+	demandOption: false,
+	describe: 'Folder/File configuration JSON file location',
+	type: 'array',
+	nargs: 1,
+})
+.check((argv) => {
+	return configCheck(argv.i);
+});
+
 
 //Input option
 yargs
@@ -110,3 +126,4 @@ try {
 	process.exit(1);
 }
 yargs.argv;
+
