@@ -23,7 +23,7 @@ const path = require('path');
  * @param {string} argv - input path
  * @return {boolean}
  */
- const configCheck = (argv) => {
+ const configurationCheck = (argv) => {
 	//Check if path exist
 	if (fs.existsSync(argv)) {
 		//Check the path

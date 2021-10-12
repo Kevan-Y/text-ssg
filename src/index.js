@@ -9,7 +9,7 @@ const { stylesheetCheck } = require('./utils/yargsOptionCheck/stylesheetCheck');
 const { outputCheck } = require('./utils/yargsOptionCheck/outputCheck');
 const { inputCheck, isFile } = require('./utils/yargsOptionCheck/inputCheck');
 const { langCheck } = require('./utils/yargsOptionCheck/langCheck');
-const { configCheck } = require('./utils/yargsOptionCheck/configurationCheck');
+const { configurationCheck } = require('./utils/yargsOptionCheck/configurationCheck');
 
 //Clear CLI and display Header
 clear();
@@ -36,6 +36,7 @@ yargs.example(
 	`ssg --input <path> --output <path> --stylesheet <URL> --lang <languageCode>`,
 );
 yargs.example(`ssg -i <path> -o <path> -s <URL> -l <languageCode>`);
+yargs.example(`ssg -c <path>`);
 
 //reject non explicits
 yargs.strict().fail((msg, err, yargs) => {
@@ -57,7 +58,7 @@ yargs
 	nargs: 1,
 })
 .check((argv) => {
-	return configCheck(argv.i);
+	return configurationCheck(argv.c);
 });
 
 
@@ -65,12 +66,13 @@ yargs
 yargs
 	.option('i', {
 		alias: 'input',
-		demandOption: true,
+		demandOption: false,
 		describe: 'Folder/File input location',
 		type: 'string',
 		nargs: 1,
 	})
 	.check((argv) => {
+
 		return inputCheck(argv.i);
 	});
 
@@ -112,6 +114,7 @@ yargs
 	.check((argv) => {
 		return langCheck(argv.l);
 	});
+//TODO :: if the option is c or config, run applyConfig instead of below
 //Call convertToHtml
 try {
 	convertToHtml(
