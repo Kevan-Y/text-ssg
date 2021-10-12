@@ -10,7 +10,7 @@ const { outputCheck } = require('./utils/yargsOptionCheck/outputCheck');
 const { inputCheck, isFile } = require('./utils/yargsOptionCheck/inputCheck');
 const { langCheck } = require('./utils/yargsOptionCheck/langCheck');
 const { configurationCheck } = require('./utils/yargsOptionCheck/configurationCheck');
-
+const { readConfig } = require('../applyConfiguration');
 //Clear CLI and display Header
 clear();
 console.log(
@@ -48,20 +48,6 @@ yargs.strict().fail((msg, err, yargs) => {
 });
 
 
-//Configuration option
-yargs
-.option('c', {
-	alias: 'config',
-	demandOption: false,
-	describe: 'Folder/File configuration JSON file location',
-	type: 'array',
-	nargs: 1,
-})
-.check((argv) => {
-	return configurationCheck(argv.c);
-});
-
-
 //Input option
 yargs
 	.option('i', {
@@ -72,7 +58,6 @@ yargs
 		nargs: 1,
 	})
 	.check((argv) => {
-
 		return inputCheck(argv.i);
 	});
 
@@ -114,19 +99,46 @@ yargs
 	.check((argv) => {
 		return langCheck(argv.l);
 	});
-//TODO :: if the option is c or config, run applyConfig instead of below
-//Call convertToHtml
-try {
-	convertToHtml(
-		yargs.argv.i,
-		yargs.argv.s,
-		yargs.argv.o,
-		isFile(yargs.argv.i),
-		yargs.argv.l,
-	);
-} catch (e) {
-	console.error(`\n\n${chalk.red.bold('Error:')} ${chalk.red(e)}`);
-	process.exit(1);
+
+//configuration option
+yargs
+	.option('c', {
+		alias: 'config',
+		describe: 'Folder/File configuration JSON file location',
+		type: 'string',
+		nargs: 1
+	})
+	.check((argv) => {
+		return configurationCheck(argv.c);
+	});
+
+//if the ption is c or config, run applyConfig instead of below
+if(yargs.argv.c){
+	console.log("option config have been selected");
+	try {
+		const config = readConfig(yargs.argv.c);
+		argv.i = [config.input];
+		argv.o = [config.output];
+		argv.l = [config.lang];
+	} catch (e) {
+		console.error(`\n\n${chalk.red.bold('Error:')} ${chalk.red(e)}`);
+		process.exit(1);
+	}
+}else {
+	yargs.argv.i.demandOption = true;
+	//Call convertToHtml
+	try {
+		convertToHtml(
+			yargs.argv.i,
+			yargs.argv.s,
+			yargs.argv.o,
+			isFile(yargs.argv.i),
+			yargs.argv.l,
+		);
+	} catch (e) {
+		console.error(`\n\n${chalk.red.bold('Error:')} ${chalk.red(e)}`);
+		process.exit(1);
+	}
 }
 yargs.argv;
 
