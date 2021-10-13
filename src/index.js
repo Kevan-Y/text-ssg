@@ -129,7 +129,7 @@ if(yargs.argv.c){
 		process.exit(1);
 	}
 }else {
-	yargs.demandOption['input'] = true;
+	yargs.demandOption['input'];
 	//Call convertToHtml
 	try {
 		convertToHtml(
