@@ -114,12 +114,16 @@ yargs
 
 //if the ption is c or config, run applyConfig instead of below
 if(yargs.argv.c){
-	console.log("option config have been selected");
 	try {
 		const config = readConfig(yargs.argv.c);
-		argv.i = [config.input];
-		argv.o = [config.output];
-		argv.l = [config.lang];
+		convertToHtml(
+			config.input,
+			congig.stylesheet,
+			config.output,
+			isFile(config.input),
+			config.lang,
+		);
+		console.log(config.output);
 	} catch (e) {
 		console.error(`\n\n${chalk.red.bold('Error:')} ${chalk.red(e)}`);
 		process.exit(1);
