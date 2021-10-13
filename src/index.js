@@ -36,7 +36,7 @@ yargs.example(
 	`ssg --input <path> --output <path> --stylesheet <URL> --lang <languageCode>`,
 );
 yargs.example(`ssg -i <path> -o <path> -s <URL> -l <languageCode>`);
-yargs.example(`ssg -c <path>`);
+yargs.example(`ssg -c <path> -i <path>`);
 
 //reject non explicits
 yargs.strict().fail((msg, err, yargs) => {
@@ -112,24 +112,24 @@ yargs
 		return configurationCheck(argv.c);
 	});
 
-//if the ption is c or config, run applyConfig instead of below
+//if the option is c or config, use the custom configuration
 if(yargs.argv.c){
 	try {
 		const config = readConfig(yargs.argv.c);
+		if(!config.input) throw new Error('Directory or file must exist.');
 		convertToHtml(
 			config.input,
-			congig.stylesheet,
-			config.output,
+			config.stylesheet,
+			config.output || './dist',
 			isFile(config.input),
 			config.lang,
 		);
-		console.log(config.output);
 	} catch (e) {
 		console.error(`\n\n${chalk.red.bold('Error:')} ${chalk.red(e)}`);
 		process.exit(1);
 	}
 }else {
-	yargs.argv.i.demandOption = true;
+	yargs.demandOption['input'] = true;
 	//Call convertToHtml
 	try {
 		convertToHtml(
