@@ -49,13 +49,13 @@ ssg -c <path> -i <path>
    |_|    \___| /_/\_\  \__|             |____/  |____/   \____|
 
 Options:
-    -v, --version     Show version number            					 [boolean]
-    -h, --help        Show help                      					 [boolean]
-    -i, --input       Folder/File input location    		   [string] [required]
-    -s, --stylesheet  URL to a CSS stylesheet        		 			  [string]
+    -v, --version     Show version number            			 [boolean]
+    -h, --help        Show help                      		   	 [boolean]
+    -i, --input       Folder/File input location    	       [string] [required]
+    -s, --stylesheet  URL to a CSS stylesheet         			  [string]
     -o, --output      Folder output location          [string] [default: "./dist"]
     -l, --lang        HTML lang tag                    [string] [default: "en-CA"]
-	-c, --config      Folder/File configuration JSON file location        [string]
+    -c, --config      Folder/File configuration JSON file location        [string]
 ```
 
 ## Example
