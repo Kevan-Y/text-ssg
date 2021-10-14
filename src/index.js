@@ -9,7 +9,9 @@ const { stylesheetCheck } = require('./utils/yargsOptionCheck/stylesheetCheck');
 const { outputCheck } = require('./utils/yargsOptionCheck/outputCheck');
 const { inputCheck, isFile } = require('./utils/yargsOptionCheck/inputCheck');
 const { langCheck } = require('./utils/yargsOptionCheck/langCheck');
-const { configurationCheck } = require('./utils/yargsOptionCheck/configurationCheck');
+const {
+	configurationCheck,
+} = require('./utils/yargsOptionCheck/configurationCheck');
 const { readConfig } = require('../applyConfiguration');
 //Clear CLI and display Header
 clear();
@@ -46,7 +48,6 @@ yargs.strict().fail((msg, err, yargs) => {
 	console.error(`\n\n${chalk.red.bold('Error:')} ${chalk.red(msg || err)}`);
 	process.exit(1);
 });
-
 
 //Input option
 yargs
@@ -106,17 +107,17 @@ yargs
 		alias: 'config',
 		describe: 'Folder/File configuration JSON file location',
 		type: 'string',
-		nargs: 1
+		nargs: 1,
 	})
 	.check((argv) => {
 		return configurationCheck(argv.c);
 	});
 
 //if the option is c or config, use the custom configuration
-if(yargs.argv.c){
+if (yargs.argv.c) {
 	try {
 		const config = readConfig(yargs.argv.c);
-		if(!config.input) throw new Error('Directory or file must exist.');
+		if (!config.input) throw new Error('Directory or file must exist.');
 		convertToHtml(
 			config.input,
 			config.stylesheet,
@@ -128,8 +129,9 @@ if(yargs.argv.c){
 		console.error(`\n\n${chalk.red.bold('Error:')} ${chalk.red(e)}`);
 		process.exit(1);
 	}
-}else {
-	yargs.demandOption['input'];
+} else {
+	yargs.demandOption(['input']);
+
 	//Call convertToHtml
 	try {
 		convertToHtml(
@@ -145,4 +147,3 @@ if(yargs.argv.c){
 	}
 }
 yargs.argv;
-
