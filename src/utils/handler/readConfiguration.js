@@ -1,6 +1,4 @@
-const path = require('path');
 const fs = require('fs');
-
 
 /**
  * readConfig reads the configuration options

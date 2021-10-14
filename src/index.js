@@ -2,7 +2,7 @@
 const yargs = require('yargs');
 const version = require('../package.json').version;
 const clear = require('clear');
-const convertToHtml = require('../ssgHandler');
+const convertToHtml = require('./utils/handler/ssgHandler');
 const chalk = require('chalk');
 const figlet = require('figlet');
 const { stylesheetCheck } = require('./utils/yargsOptionCheck/stylesheetCheck');
@@ -12,7 +12,8 @@ const { langCheck } = require('./utils/yargsOptionCheck/langCheck');
 const {
 	configurationCheck,
 } = require('./utils/yargsOptionCheck/configurationCheck');
-const { readConfig } = require('../applyConfiguration');
+const { readConfig } = require('./utils/handler/readConfiguration');
+
 //Clear CLI and display Header
 clear();
 console.log(
@@ -44,7 +45,6 @@ yargs.example(`ssg -c <path> -i <path>`);
 yargs.strict().fail((msg, err, yargs) => {
 	//Print Error with help option
 	console.log(yargs.help());
-
 	console.error(`\n\n${chalk.red.bold('Error:')} ${chalk.red(msg || err)}`);
 	process.exit(1);
 });
@@ -114,36 +114,27 @@ yargs
 	});
 
 //if the option is c or config, use the custom configuration
-if (yargs.argv.c) {
-	try {
-		const config = readConfig(yargs.argv.c);
-		if (!config.input) throw new Error('Directory or file must exist.');
-		convertToHtml(
-			config.input,
-			config.stylesheet,
-			config.output || './dist',
-			isFile(config.input),
-			config.lang,
-		);
-	} catch (e) {
-		console.error(`\n\n${chalk.red.bold('Error:')} ${chalk.red(e)}`);
-		process.exit(1);
-	}
-} else {
-	yargs.demandOption(['input']);
+try {
+	let config = null;
+	if (yargs.argv.c) {
+		config = readConfig(yargs.argv.c);
+		inputCheck(config.input);
+		langCheck((config.lang ||= 'en-CA'));
+		outputCheck((config.output ||= './dist'));
+		stylesheetCheck(config.stylesheet);
+	} else yargs.demandOption(['input']);
 
 	//Call convertToHtml
-	try {
-		convertToHtml(
-			yargs.argv.i,
-			yargs.argv.s,
-			yargs.argv.o,
-			isFile(yargs.argv.i),
-			yargs.argv.l,
-		);
-	} catch (e) {
-		console.error(`\n\n${chalk.red.bold('Error:')} ${chalk.red(e)}`);
-		process.exit(1);
-	}
+	convertToHtml(
+		config ? config.input : yargs.argv.i,
+		config ? config.stylesheet : yargs.argv.s,
+		config ? config.output : yargs.argv.o,
+		isFile(config ? config.input : yargs.argv.i),
+		config ? config.lang : yargs.argv.l,
+	);
+} catch (e) {
+	yargs.showHelp('log');
+	console.error(`\n\n${chalk.red.bold('Error:')} ${chalk.red(e.message)}`);
+	process.exit(1);
 }
 yargs.argv;
