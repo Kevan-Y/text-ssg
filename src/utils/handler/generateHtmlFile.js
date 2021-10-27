@@ -30,16 +30,12 @@ const createHtmlFile = async (
 		extname,
 		langCode,
 	};
-
 	const noSpaceFileName = fileName.replaceAll(' ', '-');
 	try {
 		//Create a new html file
 		await fs.promises.writeFile(
 			path.join(`${outputPath}`, `${noSpaceFileName}.html`),
 			generateHtmlTemplate(htmlOption),
-			(err) => {
-				if (err) throw new Error(err);
-			},
 		);
 	} catch (e) {
 		throw new Error(

@@ -8,6 +8,11 @@ const generateHtmlTemplate = (options) => {
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         ${
+					options.extname === '.md'
+						? '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/github.min.css"/>'
+						: ''
+				}
+        ${
 					options.style
 						? `<link rel="stylesheet" href="${options.style}">`
 						: `<style>
@@ -83,7 +88,10 @@ const generateHtmlTemplate = (options) => {
 						: ''
 				}
         ${
-					options.content.map((paragraph) => `${paragraph}\n`).join('\n') || ''
+					Array.isArray(options.content)
+						? options.content.map((paragraph) => `${paragraph}\n`).join('\n') ||
+						  ''
+						: options.content
 				} 
     </body>
     </html>

@@ -1,3 +1,21 @@
+const hljs = require('highlight.js');
+
+//Markdown config
+const md = require('markdown-it')({
+	html: true,
+	linkify: true,
+	typographer: true,
+	highlight: function (str, lang) {
+		if (lang && hljs.getLanguage(lang)) {
+			try {
+				return hljs.highlight(str, { language: lang }).value;
+			} catch (__) {}
+		}
+
+		return ''; // use external default escaping
+	},
+});
+
 /**
  * dataProcessing separate data title and content
  * @param {string} data
@@ -25,43 +43,8 @@ const dataProcessing = (data, fileExtension) => {
 		data = data.join('').split('_space_');
 		dataTreated.content = data.map((paragraph) => `<p>${paragraph}</p>`);
 	} else {
-		// If file is .md, assuming the Markdown syntax is correct, replace each Markdown tag to its HTML equivalent
-
-		// convert --- to <hr>
-		const hr = new RegExp(/^---$/, 'gm');
-		data = data.replaceAll(hr, '<hr>');
-
-		// Links could have the form of [name](href title) or [name](href)
-		const links = new RegExp(/\[(.*?)\]\((.+?)(?:\s"(.*?)")?\)/, 'gm');
-		data = data.replaceAll(
-			links,
-			(match, p1, p2, p3) =>
-				`<a href="${p2}" ${p3 ? `title="${p3}"` : ''}>${p1}</a>`,
-		);
-
-		const bolds = new RegExp(/\*{2}(.+?)\*{2}/, 'gm');
-		data = data.replaceAll(bolds, '<strong>$1</strong>');
-
-		const italics = new RegExp(/\*{1}(.+?)\*{1}/, 'gm');
-		data = data.replaceAll(italics, '<i>$1</i>');
-
-		data = data.split(/(?:\r?\n)+/).map((paragraph) => {
-			// heading starts with 1 or more hash sign followed by a white space
-			const headings = new RegExp(/^\s*(#{1,6})\s+(.+)$/, 'gm');
-			if (headings.test(paragraph)) {
-				return paragraph.replaceAll(headings, (match, hash, title) => {
-					dataTreated.title =
-						!dataTreated.title && hash.length === 1 ? title : dataTreated.title;
-					const tag = `h${hash.length}`;
-					return `<${tag}>${title}</${tag}>`;
-				});
-			}
-			if (/^<.*>$/.test(paragraph)) return paragraph;
-			return `<p>${paragraph}</p>`;
-		});
-
-		// in markdown, paragraphs are splitted by one or more New line.
-		dataTreated.content = data;
+		// Convert to markdown
+		dataTreated.content = md.render(data);
 	}
 	return dataTreated;
 };
