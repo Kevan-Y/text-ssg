@@ -1,10 +1,7 @@
-const {
-	generateHtmlTemplate,
-	generateHtmlMenuTemplate,
-} = require('./htmlTemplate');
 const path = require('path');
-const { dataProcessing } = require('./dataProcessing');
 const fs = require('fs');
+const { generateHtmlTemplate, generateHtmlMenuTemplate } = require('./htmlTemplate');
+const { dataProcessing } = require('./dataProcessing');
 
 /**
  * createHtmlFile generateHTML file
@@ -14,38 +11,28 @@ const fs = require('fs');
  * @param {string} outputPath
  * @param {string} langCode
  */
-const createHtmlFile = async (
-	fileName,
-	data,
-	stylesheet,
-	outputPath,
-	langCode,
-) => {
-	const extname = path.extname(fileName);
-	fileName = path.basename(fileName, extname);
+const createHtmlFile = async (fileName_, data, stylesheet, outputPath, langCode) => {
+  const extname = path.extname(fileName_);
+  const fileName = path.basename(fileName_, extname);
 
-	let htmlOption = {
-		...dataProcessing(data, extname),
-		style: stylesheet,
-		extname,
-		langCode,
-	};
-	const noSpaceFileName = fileName.replaceAll(' ', '-');
-	try {
-		//Create a new html file
-		await fs.promises.writeFile(
-			path.join(`${outputPath}`, `${noSpaceFileName}.html`),
-			generateHtmlTemplate(htmlOption),
-		);
-	} catch (e) {
-		throw new Error(
-			`On write file ${path.join(`${outputPath}`, `${noSpaceFileName}.html`)}`,
-		);
-	}
-	console.log(
-		`File created -> ${path.join(`${outputPath}`, `${noSpaceFileName}.html`)}`,
-	);
-	return path.join(`${outputPath}`, `${fileName}.html`);
+  const htmlOption = {
+    ...dataProcessing(data, extname),
+    style: stylesheet,
+    extname,
+    langCode,
+  };
+  const noSpaceFileName = fileName.replaceAll(' ', '-');
+  try {
+    // Create a new html file
+    await fs.promises.writeFile(
+      path.join(`${outputPath}`, `${noSpaceFileName}.html`),
+      generateHtmlTemplate(htmlOption)
+    );
+  } catch (e) {
+    throw new Error(`On write file ${path.join(`${outputPath}`, `${noSpaceFileName}.html`)}`);
+  }
+  console.log(`File created -> ${path.join(`${outputPath}`, `${noSpaceFileName}.html`)}`);
+  return path.join(`${outputPath}`, `${fileName}.html`);
 };
 
 /**
@@ -55,32 +42,25 @@ const createHtmlFile = async (
  * @param {string} outputPath
  * @param {string} langCode
  */
-const createIndexHtmlFile = async (
-	routeList,
-	stylesheet,
-	outputPath,
-	langCode,
-) => {
-	let htmlOption = {
-		routeList,
-		style: stylesheet,
-		langCode,
-	};
-	try {
-		//Create a new html file
-		await fs.promises.writeFile(
-			path.join(`${outputPath}`, `index.html`),
-			generateHtmlMenuTemplate(htmlOption),
-			(err) => {
-				if (err) throw new Error(err);
-			},
-		);
-	} catch (e) {
-		throw new Error(
-			`On write file ${path.join(`${outputPath}`, `index.html`)}`,
-		);
-	}
-	console.log(`File created -> ${path.join(`${outputPath}`, `index.html`)}`);
+const createIndexHtmlFile = async (routeList, stylesheet, outputPath, langCode) => {
+  const htmlOption = {
+    routeList,
+    style: stylesheet,
+    langCode,
+  };
+  try {
+    // Create a new html file
+    await fs.promises.writeFile(
+      path.join(`${outputPath}`, 'index.html'),
+      generateHtmlMenuTemplate(htmlOption),
+      (err) => {
+        if (err) throw new Error(err);
+      }
+    );
+  } catch (e) {
+    throw new Error(`On write file ${path.join(`${outputPath}`, 'index.html')}`);
+  }
+  console.log(`File created -> ${path.join(`${outputPath}`, 'index.html')}`);
 };
 
 module.exports = { createHtmlFile, createIndexHtmlFile };

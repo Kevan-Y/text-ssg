@@ -4,7 +4,13 @@
 	"description": "This is a Static Site Generator CLI that convert .txt and .md files into .html files",
 	"main": "src/index.js",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"prettier": "prettier --write \"./**/*.{md,json,html,js}\"",
+		"prettier-check": "prettier --check \"./**/*.{md,json,html,js}\"",
+		"eslint": "eslint --config .eslintrc.js .",
+		"eslint-fix": "eslint --fix --config .eslintrc.js  .",
+		"lint": "npm run eslint",
+		"prepare": "husky install"
 	},
 	"repository": {
 		"type": "git",
@@ -26,5 +32,15 @@
 		"highlight.js": "^11.3.1",
 		"markdown-it": "^12.2.0",
 		"yargs": "^17.1.1"
+	},
+	"devDependencies": {
+		"eslint": "^7.32.0",
+		"eslint-config-airbnb": "^18.2.1",
+		"eslint-config-airbnb-base": "^14.2.1",
+		"eslint-config-prettier": "^8.3.0",
+		"eslint-plugin-import": "^2.25.2",
+		"eslint-plugin-prettier": "^4.0.0",
+		"husky": "^7.0.4",
+		"prettier": "2.4.1"
 	}
 }

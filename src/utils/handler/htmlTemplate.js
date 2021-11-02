@@ -1,5 +1,5 @@
-const generateHtmlTemplate = (options) => {
-	return `
+/* eslint-disable indent */
+const generateHtmlTemplate = (options) => `
     <!doctype html>
     <html lang="${options.langCode || 'en-CA'}">
     <head>
@@ -8,14 +8,14 @@ const generateHtmlTemplate = (options) => {
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         ${
-					options.extname === '.md'
-						? '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/github.min.css"/>'
-						: ''
-				}
+          options.extname === '.md'
+            ? '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/github.min.css"/>'
+            : ''
+        }
         ${
-					options.style
-						? `<link rel="stylesheet" href="${options.style}">`
-						: `<style>
+          options.style
+            ? `<link rel="stylesheet" href="${options.style}">`
+            : `<style>
     @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@700&display=swap');
 
     ::-webkit-scrollbar {
@@ -79,27 +79,20 @@ const generateHtmlTemplate = (options) => {
         color: #3B82F6;
     }
 </style>`
-				}
+        }
     </head>
     <body>
+        ${options.extname === '.txt' ? `<h1>${options.title || 'Document'}</h1>` : ''}
         ${
-					options.extname === '.txt'
-						? `<h1>${options.title || 'Document'}</h1>`
-						: ''
-				}
-        ${
-					Array.isArray(options.content)
-						? options.content.map((paragraph) => `${paragraph}\n`).join('\n') ||
-						  ''
-						: options.content
-				} 
+          Array.isArray(options.content)
+            ? options.content.map((paragraph) => `${paragraph}\n`).join('\n') || ''
+            : options.content
+        } 
     </body>
     </html>
     `;
-};
 
-const generateHtmlMenuTemplate = (options) => {
-	return `
+const generateHtmlMenuTemplate = (options) => `
     <!doctype html>
     <html lang="${options.langCode || 'en-CA'}">
     <head>
@@ -108,9 +101,9 @@ const generateHtmlMenuTemplate = (options) => {
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         ${
-					options.style
-						? `<link rel="stylesheet" href="${options.style}">`
-						: `<style>
+          options.style
+            ? `<link rel="stylesheet" href="${options.style}">`
+            : `<style>
     @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@700&display=swap');
 
     ::-webkit-scrollbar {
@@ -174,19 +167,18 @@ const generateHtmlMenuTemplate = (options) => {
         color: #3B82F6;
     }
 </style>`
-				}
+        }
     </head>
     <body>
         <h1>Home menu</h1>
         <h2>Summary</h2>
             <ul>
         ${options.routeList
-					.map((route) => `<li><a href='${route.url}'>${route.name}</a></li>`)
-					.join('\n')}
+          .map((route) => `<li><a href='${route.url}'>${route.name}</a></li>`)
+          .join('\n')}
         </ul>
     </body>
     </html>
     `;
-};
 
 module.exports = { generateHtmlTemplate, generateHtmlMenuTemplate };

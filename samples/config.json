@@ -1,4 +1,4 @@
 {
     "input": "./samples",
-    "output": "./newDist"
+    "output": "./dist"
 }

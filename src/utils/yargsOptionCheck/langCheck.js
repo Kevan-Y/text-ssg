@@ -6,14 +6,13 @@ const fs = require('fs');
  * @return {boolean}
  */
 const langCheck = (argv) => {
-	const rawData = fs.readFileSync('./src/languageData/languageCode.json');
-	const langCode = JSON.parse(rawData);
-	langCode.lang = langCode.lang.map((lang) => {
-		return lang.toLowerCase();
-	});
-	if (langCode.lang.includes(argv.toLowerCase())) {
-		return true;
-	} else throw new Error('Must be an valid code language.');
+  const rawData = fs.readFileSync('./src/languageData/languageCode.json');
+  const langCode = JSON.parse(rawData);
+  langCode.lang = langCode.lang.map((lang) => lang.toLowerCase());
+  if (langCode.lang.includes(argv.toLowerCase())) {
+    return true;
+  }
+  throw new Error('Must be an valid code language.');
 };
 
 module.exports = { langCheck };

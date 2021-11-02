@@ -6,9 +6,9 @@ const fs = require('fs');
  * @return {object} json object
  */
 const readConfig = (fileName) => {
-	const configFile = fs.readFileSync(fileName);
-	const data = JSON.parse(configFile);
-	return data;
+  const configFile = fs.readFileSync(fileName);
+  const data = JSON.parse(configFile);
+  return data;
 };
 
 module.exports = { readConfig };
