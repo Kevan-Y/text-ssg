@@ -4,7 +4,14 @@
 	"description": "This is a Static Site Generator CLI that convert .txt and .md files into .html files",
 	"main": "src/index.js",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
+		"test": "jest --verbose",
+    "test-silent": "jest --silent --verbose",
+    "test-watch": "jest --verbose --watchAll",
+    "test-watch-silent": "jest --verbose --watchAll --silent",
+    "jest": "jest --verbose --",
+    "jest-silent": "jest --silent --verbose --",
+    "jest-watch": "jest --verbose --watch --",
+    "jest-watch-silent": "jest --silent  --watch --verbose --",
 		"prettier": "prettier --write \"./**/*.{md,json,html,js}\"",
 		"prettier-check": "prettier --check \"./**/*.{md,json,html,js}\"",
 		"eslint": "eslint --config .eslintrc.js .",
@@ -41,6 +48,7 @@
 		"eslint-plugin-import": "^2.25.2",
 		"eslint-plugin-prettier": "^4.0.0",
 		"husky": "^7.0.4",
+		"jest": "^27.3.1",
 		"prettier": "2.4.1"
 	}
 }

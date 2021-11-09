@@ -26,7 +26,7 @@ const md = require('markdown-it')({
 const dataProcessing = (data_, fileExtension) => {
   const dataTreated = { title: '', content: '' };
 
-  if (fileExtension === '.txt') {
+  if (fileExtension === '.txt' && data_) {
     // convert data into an array
     let data = data_.split('\n').map((sentence) => sentence.replace('\r', ''));
 

@@ -6,7 +6,7 @@ const path = require('path');
 const configurationCheck = (argv) => {
   if (argv) {
     // Check if path exist
-    if (fs.lstatSync(argv)) {
+    if (fs.existsSync(argv)) {
       const extname = path.extname(argv);
       if (extname === '.json') {
         return true;

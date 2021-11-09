@@ -86,7 +86,7 @@ const generateHtmlTemplate = (options) => `
         ${
           Array.isArray(options.content)
             ? options.content.map((paragraph) => `${paragraph}\n`).join('\n') || ''
-            : options.content
+            : options.content || ''
         } 
     </body>
     </html>
