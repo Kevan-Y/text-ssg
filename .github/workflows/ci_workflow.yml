@@ -25,4 +25,4 @@ jobs:
     - name: npm install and test
       run: |
         npm install
-        npm test-silent
+        npm run test-silent
