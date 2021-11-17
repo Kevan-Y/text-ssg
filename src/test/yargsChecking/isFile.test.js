@@ -2,7 +2,7 @@ const { isFile } = require('../../utils/yargsOptionCheck/inputCheck');
 
 describe('IsFile check', () => {
   it('Check for correct file', () => {
-    const response = isFile('src\\test\\test_file\\folder_with_md_txt\\Silver Blaze.txt');
+    const response = isFile('src/test/test_file/folder_with_md_txt/Silver Blaze.txt');
     expect(response).toBe(true);
   });
 

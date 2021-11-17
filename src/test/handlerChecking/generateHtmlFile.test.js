@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 const { createHtmlFile, createIndexHtmlFile } = require('../../utils/handler/generateHtmlFile');
 
 describe('Create HTML file', () => {
@@ -8,9 +9,9 @@ describe('Create HTML file', () => {
 
   it('Should able to create a html file', async () => {
     const returnFilePath = await createHtmlFile('hello.txt', '<p>123<p>', '', './dist', 'en-fr');
-    const expectFilePath = 'dist\\hello.html';
+    const expectFilePath = 'dist/hello.html';
     expect(fs.existsSync('dist/hello.html')).toBe(true);
-    expect(returnFilePath).toEqual(expectFilePath);
+    expect(returnFilePath).toEqual(path.normalize(expectFilePath));
   });
 });
 

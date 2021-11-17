@@ -2,7 +2,7 @@ const { inputCheck } = require('../../utils/yargsOptionCheck/inputCheck');
 
 describe('Input argv check', () => {
   it('Check for correct input file', () => {
-    const response = inputCheck('src\\test\\test_file\\folder_with_md_txt\\OpenSource.md');
+    const response = inputCheck('src/test/test_file/folder_with_md_txt/OpenSource.md');
     expect(response).toBe(true);
   });
 
