@@ -4,7 +4,7 @@ const convertToHtml = require('../../utils/handler/ssgHandler');
 describe('Convert to Html', () => {
   it('Should able to create a html file', async () => {
     await convertToHtml(
-      'src\\test\\test_file\\folder_with_random_files',
+      'src/test/test_file/folder_with_random_files',
       '',
       './dist',
       false,
