@@ -18,4 +18,10 @@ describe('Get all files check', () => {
       expect(data).toEqual(expectArray);
     });
   });
+
+  it('Should throw a file not found error', () => {
+    expect(() => {
+      getAllFiles('src/test/test_file/folder_with_no_md_ztxz').toThrow();
+    });
+  });
 });
