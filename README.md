@@ -4,16 +4,10 @@
 
 ## Install
 
-1. Install required packages.
+1. Install package
 
    ```bash
-    npm install
-   ```
-
-2. Install our packages
-
-   ```bash
-   npm install -g .
+    npm install -g text-ssg
    ```
 
 ## Features
@@ -60,10 +54,10 @@ ssg -c <path> -i <path>
    |_|    \___| /_/\_\  \__|             |____/  |____/   \____|
 
 Options:
-    -v, --version     Show version number            			 [boolean]
-    -h, --help        Show help                      		   	 [boolean]
-    -i, --input       Folder/File input location    	       [string] [required]
-    -s, --stylesheet  URL to a CSS stylesheet         			  [string]
+    -v, --version     Show version number                [boolean]
+    -h, --help        Show help                             [boolean]
+    -i, --input       Folder/File input location            [string] [required]
+    -s, --stylesheet  URL to a CSS stylesheet              [string]
     -o, --output      Folder output location          [string] [default: "./dist"]
     -l, --lang        HTML lang tag                    [string] [default: "en-CA"]
     -c, --config      Folder/File configuration JSON file location        [string]
