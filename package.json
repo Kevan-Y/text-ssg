@@ -1,6 +1,6 @@
 {
 	"name": "text-ssg",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "This is a Static Site Generator CLI that convert .txt and .md files into .html files",
 	"main": "src/index.js",
 	"keywords": [

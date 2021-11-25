@@ -6,7 +6,7 @@ const fs = require('fs');
  * @return {boolean}
  */
 const langCheck = (argv) => {
-  const rawData = fs.readFileSync('./src/languageData/languageCode.json');
+  const rawData = fs.readFileSync('src/languageData/languageCode.json');
   const langCode = JSON.parse(rawData);
   langCode.lang = langCode.lang.map((lang) => lang.toLowerCase());
   if (langCode.lang.includes(argv.toLowerCase())) {
