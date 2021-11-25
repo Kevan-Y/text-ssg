@@ -7,7 +7,7 @@
 1. Install package
 
    ```bash
-    npm install -g text-ssg
+    npm install -g text-ssg@latest
    ```
 
 ## Features
